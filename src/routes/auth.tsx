@@ -20,6 +20,7 @@ function AuthPage() {
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handle(e: React.FormEvent) {
     e.preventDefault();
@@ -127,15 +128,19 @@ function AuthPage() {
 
           <button
             type="button"
+            disabled={googleLoading}
             onClick={async () => {
               setError(null);
+              setGoogleLoading(true);
               try {
                 await signInWithProvider("google");
+                // عند النجاح يتم التحويل لصفحة Google ثم العودة إلى /onboarding
               } catch (err: any) {
                 setError(err.message ?? "تعذّر تسجيل الدخول عبر Google");
+                setGoogleLoading(false);
               }
             }}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 font-bold text-sm hover:bg-secondary transition"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 font-bold text-sm hover:bg-secondary transition disabled:opacity-60"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />

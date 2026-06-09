@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Truck, Store, MapPin } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuth, getUserRoles, setPrimaryRole } from "@/lib/auth";
 import { getSupplierByUserId, upsertSupplier } from "@/lib/suppliers";
 import { getMyBuyerProfile, upsertBuyerProfile } from "@/lib/buyer";
+import { onboardingKey } from "@/lib/onboarding";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "إكمال التسجيل — مدد" }] }),
@@ -18,6 +19,14 @@ const input = "w-full rounded-2xl border border-border bg-background px-4 py-2.5
 function OnboardingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // عند إكمال البيانات: حدّث حالة البوابة فوراً حتى لا تُعيد توجيه المستخدم
+  // إلى /onboarding بناءً على نسخة مخبّأة قديمة، ثم انتقل للوجهة.
+  function finish(to: "/dashboard" | "/search") {
+    if (user) queryClient.setQueryData(onboardingKey(user.id), true);
+    navigate({ to });
+  }
 
   const { data: roles = [], isLoading: rolesLoading } = useQuery({
     queryKey: ["roles", user?.id],
@@ -83,9 +92,9 @@ function OnboardingPage() {
                 </button>
               </div>
               {selectedRole === "supplier" ? (
-                <SupplierForm userId={user!.id} onDone={() => navigate({ to: "/dashboard" })} />
+                <SupplierForm userId={user!.id} onDone={() => finish("/dashboard")} />
               ) : (
-                <BuyerForm onDone={() => navigate({ to: "/search" })} />
+                <BuyerForm onDone={() => finish("/search")} />
               )}
             </>
           )}
