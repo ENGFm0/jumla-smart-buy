@@ -60,6 +60,7 @@ export async function respondToQuote(
       quoted_price: input.quotedPrice ?? null,
       supplier_reply: input.reply ?? null,
       status: input.status,
+      quoted_at: input.status === "quoted" ? new Date().toISOString() : null,
     })
     .eq("id", id);
   if (error) throw error;

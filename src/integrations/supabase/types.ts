@@ -163,6 +163,7 @@ export type Database = {
           paid_at: string | null
           product_id: string
           quantity: number
+          quoted_at: string | null
           quoted_price: number | null
           shipped_at: string | null
           shipping_info: string | null
@@ -188,6 +189,7 @@ export type Database = {
           paid_at?: string | null
           product_id: string
           quantity?: number
+          quoted_at?: string | null
           quoted_price?: number | null
           shipped_at?: string | null
           shipping_info?: string | null
@@ -213,6 +215,7 @@ export type Database = {
           paid_at?: string | null
           product_id?: string
           quantity?: number
+          quoted_at?: string | null
           quoted_price?: number | null
           shipped_at?: string | null
           shipping_info?: string | null

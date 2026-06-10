@@ -11,6 +11,7 @@ import {
   rateOrder,
 } from "@/lib/orders";
 import { OrderTracker } from "@/components/OrderTracker";
+import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderInvoice } from "@/components/OrderInvoice";
 import {
   formatSAR,
@@ -46,15 +47,29 @@ export function OrderCard({
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h3 className="font-bold">{order.product?.name ?? "منتج"}</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {role === "buyer"
-              ? `المورّد: ${order.supplier?.name ?? "—"}${order.supplier?.city ? ` — ${order.supplier.city}` : ""}`
-              : `الكمية المطلوبة: ${order.quantity}`}
-          </p>
-          {role === "buyer" && (
-            <p className="text-sm text-muted-foreground mt-1">
-              الكمية: <span className="font-bold text-foreground">{order.quantity}</span>
-            </p>
+          {role === "buyer" ? (
+            <>
+              <p className="text-sm text-muted-foreground mt-1">
+                المورّد:{" "}
+                {order.supplier?.id ? (
+                  <Link
+                    to="/supplier/$id"
+                    params={{ id: order.supplier.id }}
+                    className="font-bold text-primary hover:underline"
+                  >
+                    {order.supplier?.name ?? "—"}
+                  </Link>
+                ) : (
+                  (order.supplier?.name ?? "—")
+                )}
+                {order.supplier?.city ? ` — ${order.supplier.city}` : ""}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                الكمية: <span className="font-bold text-foreground">{order.quantity}</span>
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground mt-1">الكمية المطلوبة: {order.quantity}</p>
           )}
           {order.note && <p className="text-sm text-muted-foreground mt-1">ملاحظة: {order.note}</p>}
         </div>
@@ -67,6 +82,16 @@ export function OrderCard({
       <div className="mt-5">
         <OrderTracker order={order} />
       </div>
+
+      {/* سجل العمليات بالتواريخ */}
+      <details className="mt-4 rounded-2xl border border-border bg-secondary/30 px-4 py-3">
+        <summary className="cursor-pointer text-sm font-bold text-muted-foreground">
+          سجل العمليات والتواريخ
+        </summary>
+        <div className="mt-3">
+          <OrderTimeline order={order} />
+        </div>
+      </details>
 
       {/* العرض/السعر */}
       {offerExists && order.quoted_price != null && (

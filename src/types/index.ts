@@ -32,6 +32,7 @@ export type ProductDetail = Product & {
 // حقول دورة حياة الطلب (مضافة في migration order_lifecycle، وغير موجودة بعد
 // في الأنواع المولّدة تلقائياً من قاعدة البيانات — نضيفها يدوياً هنا).
 export type OrderLifecycle = {
+  quoted_at: string | null;
   accepted_at: string | null;
   paid_at: string | null;
   shipped_at: string | null;
