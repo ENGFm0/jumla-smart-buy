@@ -1,17 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { OrderCard } from "@/components/OrderCard";
+import { useAuth } from "@/lib/auth";
 import { getMyQuoteRequests } from "@/lib/quotes";
-import { formatSAR, QUOTE_STATUS_LABEL, type QuoteStatus } from "@/types";
-
-const STATUS_STYLE: Record<QuoteStatus, string> = {
-  pending: "bg-amber-100 text-amber-800",
-  quoted: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-rose-100 text-rose-700",
-  closed: "bg-slate-200 text-slate-600",
-};
 
 export const Route = createFileRoute("/_authenticated/my-requests")({
   head: () => ({ meta: [{ title: "طلباتي — مدد" }] }),
@@ -19,10 +13,14 @@ export const Route = createFileRoute("/_authenticated/my-requests")({
 });
 
 function MyRequestsPage() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["my-quote-requests"],
     queryFn: getMyQuoteRequests,
   });
+
+  const refresh = () => qc.invalidateQueries({ queryKey: ["my-quote-requests"] });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -46,45 +44,15 @@ function MyRequestsPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {requests.map((r) => (
-              <div key={r.id} className="rounded-3xl bg-card border border-border p-5">
-                <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <div>
-                    <h3 className="font-bold">{r.product?.name ?? "منتج"}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      المورّد: {r.supplier?.name ?? "—"}
-                      {r.supplier?.city ? ` — ${r.supplier.city}` : ""}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      الكمية: <span className="font-bold text-foreground">{r.quantity}</span>
-                    </p>
-                    {r.note && (
-                      <p className="text-sm text-muted-foreground mt-1">ملاحظتك: {r.note}</p>
-                    )}
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-bold ${STATUS_STYLE[r.status]}`}
-                  >
-                    {QUOTE_STATUS_LABEL[r.status]}
-                  </span>
-                </div>
-
-                {(r.status === "quoted" || r.quoted_price != null || r.supplier_reply) && (
-                  <div className="mt-4 rounded-2xl bg-brand-soft/50 border border-border p-4">
-                    {r.quoted_price != null && (
-                      <div className="font-extrabold text-primary text-lg">
-                        السعر المقترح: {formatSAR(Number(r.quoted_price))}
-                      </div>
-                    )}
-                    {r.supplier_reply && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        رد المورّد: {r.supplier_reply}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
+              <OrderCard
+                key={r.id}
+                order={r}
+                role="buyer"
+                currentUserId={user?.id ?? ""}
+                onChange={refresh}
+              />
             ))}
           </div>
         )}

@@ -149,41 +149,77 @@ export type Database = {
       }
       quote_requests: {
         Row: {
+          accepted_at: string | null
+          buyer_comment: string | null
           buyer_id: string
+          buyer_rating: number | null
+          cancelled_at: string | null
+          courier_phone: string | null
           created_at: string
+          delivered_at: string | null
           id: string
+          invoice_number: string | null
           note: string | null
+          paid_at: string | null
           product_id: string
           quantity: number
           quoted_price: number | null
+          shipped_at: string | null
+          shipping_info: string | null
           status: Database["public"]["Enums"]["quote_status"]
+          supplier_comment: string | null
           supplier_id: string
+          supplier_rating: number | null
           supplier_reply: string | null
           updated_at: string
         }
         Insert: {
+          accepted_at?: string | null
+          buyer_comment?: string | null
           buyer_id: string
+          buyer_rating?: number | null
+          cancelled_at?: string | null
+          courier_phone?: string | null
           created_at?: string
+          delivered_at?: string | null
           id?: string
+          invoice_number?: string | null
           note?: string | null
+          paid_at?: string | null
           product_id: string
           quantity?: number
           quoted_price?: number | null
+          shipped_at?: string | null
+          shipping_info?: string | null
           status?: Database["public"]["Enums"]["quote_status"]
+          supplier_comment?: string | null
           supplier_id: string
+          supplier_rating?: number | null
           supplier_reply?: string | null
           updated_at?: string
         }
         Update: {
+          accepted_at?: string | null
+          buyer_comment?: string | null
           buyer_id?: string
+          buyer_rating?: number | null
+          cancelled_at?: string | null
+          courier_phone?: string | null
           created_at?: string
+          delivered_at?: string | null
           id?: string
+          invoice_number?: string | null
           note?: string | null
+          paid_at?: string | null
           product_id?: string
           quantity?: number
           quoted_price?: number | null
+          shipped_at?: string | null
+          shipping_info?: string | null
           status?: Database["public"]["Enums"]["quote_status"]
+          supplier_comment?: string | null
           supplier_id?: string
+          supplier_rating?: number | null
           supplier_reply?: string | null
           updated_at?: string
         }
@@ -200,6 +236,38 @@ export type Database = {
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          quote_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          quote_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          quote_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_messages_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
             referencedColumns: ["id"]
           },
         ]
