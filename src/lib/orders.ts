@@ -157,6 +157,25 @@ export type BuyerContact = {
   address: string | null;
 };
 
+// جلب بيانات عدة مشترين دفعة واحدة (لتجميع الطلبات الواردة حسب المشتري)
+export async function getBuyerContactsByIds(ids: string[]): Promise<Record<string, BuyerContact>> {
+  if (ids.length === 0) return {};
+  const { data } = await supabase
+    .from("buyer_profiles")
+    .select("user_id, business_name, phone, city, address")
+    .in("user_id", ids);
+  const map: Record<string, BuyerContact> = {};
+  for (const b of data ?? []) {
+    map[b.user_id] = {
+      business_name: b.business_name,
+      phone: b.phone,
+      city: b.city,
+      address: b.address,
+    };
+  }
+  return map;
+}
+
 export async function getBuyerContact(buyerUserId: string): Promise<BuyerContact | null> {
   const { data: bp } = await supabase
     .from("buyer_profiles")
