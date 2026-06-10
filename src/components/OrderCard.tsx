@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Star, Truck, CreditCard, CheckCircle2, MessageCircle, Phone } from "lucide-react";
 import { respondToQuote } from "@/lib/quotes";
 import {
@@ -10,7 +11,6 @@ import {
   rateOrder,
 } from "@/lib/orders";
 import { OrderTracker } from "@/components/OrderTracker";
-import { OrderChat } from "@/components/OrderChat";
 import { OrderInvoice } from "@/components/OrderInvoice";
 import {
   formatSAR,
@@ -31,15 +31,12 @@ type Role = "buyer" | "supplier";
 export function OrderCard({
   order,
   role,
-  currentUserId,
   onChange,
 }: {
   order: QuoteRequestDetailed;
   role: Role;
-  currentUserId: string;
   onChange: () => void;
 }) {
-  const [showChat, setShowChat] = useState(false);
   const offerExists = order.status === "quoted" || order.quoted_price != null;
   const active = order.status !== "rejected" && !order.cancelled_at;
 
@@ -121,21 +118,16 @@ export function OrderCard({
         </div>
       )}
 
-      {/* المحادثة (تتاح بعد وجود عرض) */}
+      {/* المحادثة في صفحة مستقلة (تتاح بعد وجود عرض) */}
       {offerExists && (
         <div className="mt-4">
-          <button
-            onClick={() => setShowChat((s) => !s)}
-            className="inline-flex items-center gap-2 text-sm font-bold text-primary"
+          <Link
+            to="/chat/$id"
+            params={{ id: order.id }}
+            className="inline-flex items-center gap-2 rounded-2xl border border-border px-4 py-2.5 text-sm font-bold text-primary hover:bg-secondary transition"
           >
-            <MessageCircle className="h-4 w-4" />
-            {showChat ? "إخفاء المحادثة" : "فتح المحادثة"}
-          </button>
-          {showChat && (
-            <div className="mt-2">
-              <OrderChat quoteId={order.id} currentUserId={currentUserId} />
-            </div>
-          )}
+            <MessageCircle className="h-4 w-4" /> فتح المحادثة
+          </Link>
         </div>
       )}
     </div>

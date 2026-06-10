@@ -4,7 +4,6 @@ import { Inbox } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { OrderCard } from "@/components/OrderCard";
-import { useAuth } from "@/lib/auth";
 import { getMyQuoteRequests } from "@/lib/quotes";
 
 export const Route = createFileRoute("/_authenticated/my-requests")({
@@ -13,7 +12,6 @@ export const Route = createFileRoute("/_authenticated/my-requests")({
 });
 
 function MyRequestsPage() {
-  const { user } = useAuth();
   const qc = useQueryClient();
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["my-quote-requests"],
@@ -46,13 +44,7 @@ function MyRequestsPage() {
         ) : (
           <div className="space-y-4">
             {requests.map((r) => (
-              <OrderCard
-                key={r.id}
-                order={r}
-                role="buyer"
-                currentUserId={user?.id ?? ""}
-                onChange={refresh}
-              />
+              <OrderCard key={r.id} order={r} role="buyer" onChange={refresh} />
             ))}
           </div>
         )}

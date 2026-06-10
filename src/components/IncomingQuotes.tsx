@@ -1,11 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox } from "lucide-react";
 import { OrderCard } from "@/components/OrderCard";
-import { useAuth } from "@/lib/auth";
 import { getSupplierQuoteRequests } from "@/lib/quotes";
 
 export function IncomingQuotes({ supplierId }: { supplierId: string }) {
-  const { user } = useAuth();
   const qc = useQueryClient();
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ["incoming-quotes", supplierId],
@@ -28,13 +26,7 @@ export function IncomingQuotes({ supplierId }: { supplierId: string }) {
       ) : (
         <div className="mt-4 space-y-4">
           {requests.map((r) => (
-            <OrderCard
-              key={r.id}
-              order={r}
-              role="supplier"
-              currentUserId={user?.id ?? ""}
-              onChange={refresh}
-            />
+            <OrderCard key={r.id} order={r} role="supplier" onChange={refresh} />
           ))}
         </div>
       )}

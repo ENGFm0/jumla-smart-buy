@@ -53,12 +53,15 @@ export type QuoteRequestDetailed = QuoteRequest &
     supplier: Pick<Supplier, "id" | "name" | "city" | "phone" | "whatsapp"> | null;
   };
 
-// رسالة في محادثة الطلب
+// رسالة في محادثة الطلب (مع مرفق اختياري: صوت/صورة/ملف)
 export type QuoteMessage = {
   id: string;
   quote_id: string;
   sender_id: string;
   body: string;
+  attachment_path: string | null;
+  attachment_type: string | null;
+  attachment_name: string | null;
   created_at: string;
 };
 
