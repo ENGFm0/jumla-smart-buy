@@ -13,6 +13,23 @@ export const Route = createFileRoute("/_authenticated/my-requests")({
   component: MyRequestsPage,
 });
 
+// تصنيف الطلب
+type Category = "waiting" | "ongoing" | "done" | "rejected";
+function classify(o: QuoteRequestDetailed): Category {
+  if (o.status === "rejected" || o.cancelled_at) return "rejected";
+  if (o.delivered_at) return "done";
+  if (o.status === "pending") return "waiting"; // بانتظار تسعير المورّد
+  return "ongoing"; // مسعّر / مقبول / مدفوع / مشحون
+}
+
+const TABS: { key: string; label: string; match: (c: Category) => boolean }[] = [
+  { key: "active", label: "النشطة", match: (c) => c === "waiting" || c === "ongoing" },
+  { key: "waiting", label: "المنتظر", match: (c) => c === "waiting" },
+  { key: "ongoing", label: "الجاري", match: (c) => c === "ongoing" },
+  { key: "done", label: "المنتهي", match: (c) => c === "done" },
+  { key: "rejected", label: "المرفوض", match: (c) => c === "rejected" },
+];
+
 // آخر نشاط على الطلب (لترتيب الشركات والطلبات بالأحدث)
 function lastActivity(o: QuoteRequestDetailed): number {
   const dates = [
@@ -64,10 +81,31 @@ function MyRequestsPage() {
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["my-quote-requests"] });
 
-  // تجميع الطلبات حسب الشركة (المورّد)
-  const groups = useMemo<Group[]>(() => {
-    const map = new Map<string, Group>();
+  const [tab, setTab] = useState("active");
+
+  // تصنيف كل طلب + أعداد التبويبات
+  const cat = useMemo(() => {
+    const m = new Map<string, Category>();
+    for (const r of requests) m.set(r.id, classify(r));
+    return m;
+  }, [requests]);
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { active: 0, waiting: 0, ongoing: 0, done: 0, rejected: 0 };
     for (const r of requests) {
+      const k = cat.get(r.id)!;
+      c[k]++;
+      if (k === "waiting" || k === "ongoing") c.active++;
+    }
+    return c;
+  }, [requests, cat]);
+
+  // الطلبات بعد الفلترة بالتبويب، مجمّعة حسب الشركة
+  const groups = useMemo<Group[]>(() => {
+    const t = TABS.find((x) => x.key === tab)!;
+    const filtered = requests.filter((r) => t.match(cat.get(r.id)!));
+    const map = new Map<string, Group>();
+    for (const r of filtered) {
       const key = r.supplier?.id ?? "—";
       let g = map.get(key);
       if (!g) {
@@ -91,7 +129,7 @@ function MyRequestsPage() {
     }
     arr.sort((a, b) => b.latest - a.latest);
     return arr;
-  }, [requests]);
+  }, [requests, cat, tab]);
 
   const [open, setOpen] = useState<Set<string>>(new Set());
   const toggle = (id: string) =>
@@ -106,14 +144,36 @@ function MyRequestsPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8 flex-1">
-        <div className="flex items-end justify-between gap-3 mb-6 flex-wrap">
-          <h1 className="text-2xl md:text-3xl font-extrabold">طلباتي</h1>
-          {requests.length > 0 && (
-            <span className="text-sm text-muted-foreground">
-              {groups.length} شركة · {requests.length} طلب
-            </span>
-          )}
-        </div>
+        <h1 className="text-2xl md:text-3xl font-extrabold mb-4">طلباتي</h1>
+
+        {/* تبويبات الفلترة */}
+        {requests.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-1 px-1">
+            {TABS.map((t) => {
+              const active = tab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setTab(t.key)}
+                  className={`shrink-0 rounded-2xl px-4 py-2 text-sm font-bold transition border ${
+                    active
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card text-muted-foreground border-border hover:bg-secondary"
+                  }`}
+                >
+                  {t.label}
+                  <span
+                    className={`mr-1.5 rounded-full px-1.5 py-0.5 text-[11px] ${
+                      active ? "bg-white/20" : "bg-secondary"
+                    }`}
+                  >
+                    {counts[t.key]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
@@ -130,6 +190,10 @@ function MyRequestsPage() {
             >
               تصفّح المنتجات
             </Link>
+          </div>
+        ) : groups.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-border p-12 text-center text-muted-foreground">
+            لا توجد طلبات في هذا التصنيف.
           </div>
         ) : (
           <div className="space-y-3">
