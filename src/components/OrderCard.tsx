@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Star, Truck, CreditCard, CheckCircle2, MessageCircle, Phone } from "lucide-react";
-import { respondToQuote } from "@/lib/quotes";
+import {
+  Star,
+  Truck,
+  CreditCard,
+  CheckCircle2,
+  MessageCircle,
+  Phone,
+  RotateCcw,
+} from "lucide-react";
+import { respondToQuote, createQuoteRequest } from "@/lib/quotes";
 import {
   acceptOffer,
   markPaid,
@@ -143,9 +151,9 @@ export function OrderCard({
         </div>
       )}
 
-      {/* المحادثة في صفحة مستقلة (تتاح بعد وجود عرض) */}
-      {offerExists && (
-        <div className="mt-4">
+      {/* المحادثة في صفحة مستقلة + إعادة الطلب */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {offerExists && (
           <Link
             to="/chat/$id"
             params={{ id: order.id }}
@@ -153,9 +161,46 @@ export function OrderCard({
           >
             <MessageCircle className="h-4 w-4" /> فتح المحادثة
           </Link>
-        </div>
-      )}
+        )}
+        {role === "buyer" &&
+          (order.delivered_at || order.status === "rejected" || order.cancelled_at) && (
+            <ReorderButton order={order} onChange={onChange} />
+          )}
+      </div>
     </div>
+  );
+}
+
+function ReorderButton({ order, onChange }: { order: QuoteRequestDetailed; onChange: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  async function reorder() {
+    setBusy(true);
+    try {
+      await createQuoteRequest({
+        productId: order.product_id,
+        supplierId: order.supplier_id,
+        quantity: order.quantity,
+      });
+      setDone(true);
+      onChange();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (done)
+    return <span className="text-sm font-bold text-emerald-600">تم إرسال الطلب من جديد ✓</span>;
+
+  return (
+    <button
+      onClick={reorder}
+      disabled={busy}
+      className="inline-flex items-center gap-2 rounded-2xl border border-primary text-primary px-4 py-2.5 text-sm font-bold hover:bg-brand-soft transition disabled:opacity-60"
+    >
+      <RotateCcw className="h-4 w-4" /> {busy ? "..." : "اطلب مرة ثانية"}
+    </button>
   );
 }
 

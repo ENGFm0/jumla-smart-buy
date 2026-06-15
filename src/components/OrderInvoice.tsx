@@ -76,9 +76,19 @@ export function OrderInvoice({ order }: { order: QuoteRequestDetailed }) {
         </tbody>
       </table>
 
-      <div className="flex justify-between items-center border-t border-border pt-3 mt-1">
-        <span className="font-bold">الإجمالي</span>
-        <span className="text-lg font-extrabold text-primary">{formatSAR(total)}</span>
+      <div className="space-y-1.5 border-t border-border pt-3 mt-1 text-sm">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">المجموع الفرعي</span>
+          <span className="font-bold">{formatSAR(total)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
+          <span className="font-bold">{formatSAR(total * 0.15)}</span>
+        </div>
+        <div className="flex justify-between items-center border-t border-border pt-2 mt-1">
+          <span className="font-bold">الإجمالي شامل الضريبة</span>
+          <span className="text-lg font-extrabold text-primary">{formatSAR(total * 1.15)}</span>
+        </div>
       </div>
     </div>
   );
