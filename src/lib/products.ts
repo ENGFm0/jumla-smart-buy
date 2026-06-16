@@ -14,6 +14,17 @@ export async function getCategories(): Promise<Category[]> {
   return data ?? [];
 }
 
+// المورّد يضيف فئة من عنده
+export async function addCategory(name: string): Promise<Category> {
+  const { data, error } = await supabase
+    .from("categories")
+    .insert({ id: crypto.randomUUID(), name: name.trim(), icon: "Package" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Category;
+}
+
 export async function getCategoryCounts(): Promise<Record<string, number>> {
   const { data, error } = await supabase.from("products").select("category_id");
   if (error) throw error;
@@ -131,7 +142,13 @@ export async function getProductsBySupplier(supplierId: string) {
     .eq("supplier_id", supplierId)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as Array<{ id: string; price: number; moq: number; product: Product }>;
+  return (data ?? []) as Array<{
+    id: string;
+    price: number;
+    moq: number;
+    stock: number | null;
+    product: Product;
+  }>;
 }
 
 // رفع صورة منتج إلى مخزن Supabase وإرجاع الرابط العام
@@ -155,6 +172,7 @@ export async function addProductOffer(input: {
   unit: string;
   price: number;
   moq: number;
+  stock?: number | null;
   imageUrl?: string | null;
 }) {
   const { data: product, error: prodErr } = await supabase
@@ -175,13 +193,22 @@ export async function addProductOffer(input: {
     supplier_id: input.supplierId,
     price: input.price,
     moq: input.moq,
+    stock: input.stock ?? null,
   });
   if (offerErr) throw offerErr;
   return product;
 }
 
-export async function editOffer(offerId: string, price: number, moq: number) {
-  const { error } = await supabase.from("offers").update({ price, moq }).eq("id", offerId);
+export async function editOffer(
+  offerId: string,
+  price: number,
+  moq: number,
+  stock?: number | null,
+) {
+  const { error } = await supabase
+    .from("offers")
+    .update({ price, moq, ...(stock !== undefined ? { stock } : {}) })
+    .eq("id", offerId);
   if (error) throw error;
 }
 

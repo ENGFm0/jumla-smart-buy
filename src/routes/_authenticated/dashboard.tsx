@@ -14,6 +14,7 @@ import {
   getCategories,
   getProductsBySupplier,
   addProductOffer,
+  addCategory,
   uploadProductImage,
 } from "@/lib/products";
 
@@ -73,6 +74,9 @@ function DashboardPage() {
   const [unit, setUnit] = useState("");
   const [price, setPrice] = useState("");
   const [moq, setMoq] = useState("1");
+  const [stock, setStock] = useState("");
+  const [newCatMode, setNewCatMode] = useState(false);
+  const [newCat, setNewCat] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [adding, setAdding] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -83,16 +87,25 @@ function DashboardPage() {
     setAdding(true);
     setErr(null);
     try {
+      let categoryId = cat;
+      if (newCatMode) {
+        if (!newCat.trim()) throw new Error("اكتب اسم الفئة الجديدة");
+        const c = await addCategory(newCat);
+        categoryId = c.id;
+        qc.invalidateQueries({ queryKey: ["categories"] });
+      }
+      if (!categoryId) throw new Error("اختر الفئة");
       let imageUrl: string | null = null;
       if (image) imageUrl = await uploadProductImage(image);
       await addProductOffer({
         supplierId: supplier.id,
         name: pname,
-        categoryId: cat,
+        categoryId,
         spec,
         unit,
         price: Number(price),
         moq: Number(moq),
+        stock: stock.trim() === "" ? null : Math.max(0, Number(stock) || 0),
         imageUrl,
       });
       setPname("");
@@ -100,6 +113,9 @@ function DashboardPage() {
       setUnit("");
       setPrice("");
       setMoq("1");
+      setStock("");
+      setNewCat("");
+      setNewCatMode(false);
       setImage(null);
       refetch();
     } catch (e: any) {
@@ -284,19 +300,38 @@ function DashboardPage() {
                     placeholder="اسم المنتج"
                     className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
                   />
-                  <select
-                    required
-                    value={cat}
-                    onChange={(e) => setCat(e.target.value)}
-                    className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
-                  >
-                    <option value="">اختر الفئة</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex flex-col gap-1">
+                    {newCatMode ? (
+                      <input
+                        required
+                        value={newCat}
+                        onChange={(e) => setNewCat(e.target.value)}
+                        placeholder="اسم الفئة الجديدة"
+                        className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                      />
+                    ) : (
+                      <select
+                        required
+                        value={cat}
+                        onChange={(e) => setCat(e.target.value)}
+                        className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                      >
+                        <option value="">اختر الفئة</option>
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setNewCatMode((m) => !m)}
+                      className="text-[11px] font-bold text-primary self-start"
+                    >
+                      {newCatMode ? "اختيار فئة موجودة" : "+ فئة جديدة"}
+                    </button>
+                  </div>
                   <input
                     required
                     value={unit}
@@ -329,6 +364,15 @@ function DashboardPage() {
                     onChange={(e) => setMoq(e.target.value)}
                     placeholder="الحد الأدنى"
                     className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
+                    placeholder="الكمية المتوفرة (المخزون)"
+                    title="اتركه فارغاً إذا ما تبي تتبّع المخزون. ينقص تلقائياً عند التوصيل، وتُنبَّه إذا قلّ عن 10."
+                    className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
                   />
                   <div className="col-span-2">
                     <label className="block text-sm font-bold mb-1 text-muted-foreground">
