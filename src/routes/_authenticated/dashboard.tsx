@@ -271,6 +271,11 @@ function DashboardPage() {
                 <h3 className="font-bold text-lg flex items-center gap-2">
                   <Plus className="h-5 w-5" /> إضافة منتج جديد
                 </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  ملاحظة: أدخل السعر{" "}
+                  <span className="font-bold">نهائياً شاملاً ضريبة القيمة المضافة (15%)</span> — لن
+                  تُضاف الضريبة مرة أخرى على العميل.
+                </p>
                 <form onSubmit={addProduct} className="grid grid-cols-2 gap-3 mt-4">
                   <input
                     required
@@ -312,7 +317,8 @@ function DashboardPage() {
                     min="0"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    placeholder="السعر (ر.س)"
+                    placeholder="السعر شامل الضريبة (ر.س)"
+                    title="أدخل السعر النهائي شاملاً ضريبة القيمة المضافة"
                     className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
                   />
                   <input

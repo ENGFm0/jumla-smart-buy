@@ -63,13 +63,15 @@ export function Navbar() {
               >
                 طلباتي
               </Link>
-              <Link
-                to="/financing"
-                className="hover:text-primary transition"
-                activeProps={{ className: "text-primary" }}
-              >
-                شراء بالآجل
-              </Link>
+              {!isSupplier && (
+                <Link
+                  to="/financing"
+                  className="hover:text-primary transition"
+                  activeProps={{ className: "text-primary" }}
+                >
+                  شراء بالآجل
+                </Link>
+              )}
               {isSupplier && (
                 <Link
                   to="/dashboard"

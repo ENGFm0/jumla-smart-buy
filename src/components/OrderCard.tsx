@@ -344,13 +344,17 @@ function SupplierPriceForm({
 
   return (
     <div className="grid sm:grid-cols-2 gap-2">
+      <p className="sm:col-span-2 text-xs text-muted-foreground -mb-1">
+        أدخل السعر <span className="font-bold">شاملاً ضريبة القيمة المضافة (15%)</span> — لن تُضاف
+        مرة أخرى.
+      </p>
       <input
         type="number"
         step="0.01"
         min="0"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
-        placeholder="السعر المقترح للوحدة (ر.س)"
+        placeholder="السعر للوحدة شامل الضريبة (ر.س)"
         className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
       />
       <input

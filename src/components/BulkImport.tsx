@@ -192,7 +192,7 @@ export function BulkImport({ supplierId, onDone }: { supplierId: string; onDone:
       </h3>
       <p className="text-sm text-muted-foreground mt-1">
         ارفع آلاف المنتجات دفعة واحدة. نزّل القالب، عبّئه (يمكن من Excel ثم حفظ بصيغة CSV)، ثم
-        ارفعه.
+        ارفعه. <span className="font-bold">الأسعار تُدخَل شاملة ضريبة القيمة المضافة (15%).</span>
       </p>
 
       <div className="flex flex-wrap gap-2 mt-4">
