@@ -42,8 +42,7 @@ export async function getProductsWithStats(filter?: {
 }): Promise<ProductWithStats[]> {
   // 1) المنتجات المطابقة للفلاتر الأساسية
   let q = supabase.from("products").select("*").order("name");
-  if (filter?.categoryId && filter.categoryId !== "all")
-    q = q.eq("category_id", filter.categoryId);
+  if (filter?.categoryId && filter.categoryId !== "all") q = q.eq("category_id", filter.categoryId);
   if (filter?.search) q = q.ilike("name", `%${filter.search}%`);
   if (filter?.ids) {
     if (filter.ids.length === 0) return [];
@@ -88,17 +87,19 @@ export async function getProductsWithStats(filter?: {
     grouped.set(o.product_id, g);
   }
 
-  return products
-    .map((p) => {
-      const g = grouped.get(p.id);
-      return {
-        ...p,
-        stats: g && g.prices.length > 0 ? statsFromPrices(g.prices) : null,
-        cheapest_supplier: g?.cheapest ?? null,
-      } as ProductWithStats;
-    })
-    // عند فلترة المدينة نُخفي المنتجات بلا عروض في تلك المدينة
-    .filter((p) => (supplierIdsInCity ? p.stats !== null : true));
+  return (
+    products
+      .map((p) => {
+        const g = grouped.get(p.id);
+        return {
+          ...p,
+          stats: g && g.prices.length > 0 ? statsFromPrices(g.prices) : null,
+          cheapest_supplier: g?.cheapest ?? null,
+        } as ProductWithStats;
+      })
+      // عند فلترة المدينة نُخفي المنتجات بلا عروض في تلك المدينة
+      .filter((p) => (supplierIdsInCity ? p.stats !== null : true))
+  );
 }
 
 export async function getProductWithOffers(id: string): Promise<ProductDetail | null> {
@@ -187,4 +188,50 @@ export async function editOffer(offerId: string, price: number, moq: number) {
 export async function deleteOffer(offerId: string) {
   const { error } = await supabase.from("offers").delete().eq("id", offerId);
   if (error) throw error;
+}
+
+// استيراد جماعي للمنتجات + عروضها (دفعات) — لرفع آلاف الأصناف عبر ملف.
+export type BulkRow = {
+  name: string;
+  categoryId: string;
+  spec: string;
+  unit: string;
+  price: number;
+  moq: number;
+};
+
+export async function bulkAddProducts(
+  supplierId: string,
+  rows: BulkRow[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<number> {
+  const CHUNK = 200;
+  let done = 0;
+  for (let i = 0; i < rows.length; i += CHUNK) {
+    const slice = rows.slice(i, i + CHUNK);
+    const { data: products, error } = await supabase
+      .from("products")
+      .insert(
+        slice.map((r) => ({
+          name: r.name,
+          category_id: r.categoryId,
+          spec: r.spec || null,
+          unit: r.unit,
+          icon: "Package",
+        })),
+      )
+      .select("id");
+    if (error) throw error;
+    const offers = (products ?? []).map((p, idx) => ({
+      product_id: p.id,
+      supplier_id: supplierId,
+      price: slice[idx].price,
+      moq: slice[idx].moq,
+    }));
+    const { error: offErr } = await supabase.from("offers").insert(offers);
+    if (offErr) throw offErr;
+    done += slice.length;
+    onProgress?.(done, rows.length);
+  }
+  return done;
 }

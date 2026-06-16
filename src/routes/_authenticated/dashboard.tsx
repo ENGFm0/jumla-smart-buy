@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Rating } from "@/components/Rating";
 import { IncomingQuotes } from "@/components/IncomingQuotes";
+import { BulkImport } from "@/components/BulkImport";
 import { SupplierProductRow } from "@/components/SupplierProductRow";
 import { useAuth } from "@/lib/auth";
 import { getSupplierByUserId, upsertSupplier } from "@/lib/suppliers";
@@ -48,9 +49,12 @@ function DashboardPage() {
   const [mapsUrl, setMapsUrl] = useState("");
   useEffect(() => {
     if (supplier) {
-      setName(supplier.name); setCity(supplier.city);
-      setPhone(supplier.phone); setWhatsapp(supplier.whatsapp);
-      setDescription(supplier.description ?? ""); setAddress(supplier.address ?? "");
+      setName(supplier.name);
+      setCity(supplier.city);
+      setPhone(supplier.phone);
+      setWhatsapp(supplier.whatsapp);
+      setDescription(supplier.description ?? "");
+      setAddress(supplier.address ?? "");
       setMapsUrl(supplier.maps_url ?? "");
     }
   }, [supplier]);
@@ -76,19 +80,33 @@ function DashboardPage() {
   async function addProduct(e: React.FormEvent) {
     e.preventDefault();
     if (!supplier) return;
-    setAdding(true); setErr(null);
+    setAdding(true);
+    setErr(null);
     try {
       let imageUrl: string | null = null;
       if (image) imageUrl = await uploadProductImage(image);
       await addProductOffer({
-        supplierId: supplier.id, name: pname, categoryId: cat,
-        spec, unit, price: Number(price), moq: Number(moq), imageUrl,
+        supplierId: supplier.id,
+        name: pname,
+        categoryId: cat,
+        spec,
+        unit,
+        price: Number(price),
+        moq: Number(moq),
+        imageUrl,
       });
-      setPname(""); setSpec(""); setUnit(""); setPrice(""); setMoq("1"); setImage(null);
+      setPname("");
+      setSpec("");
+      setUnit("");
+      setPrice("");
+      setMoq("1");
+      setImage(null);
       refetch();
     } catch (e: any) {
       setErr(e.message ?? "تعذّر الحفظ");
-    } finally { setAdding(false); }
+    } finally {
+      setAdding(false);
+    }
   }
 
   if (sl) return <div className="p-10 text-center">جاري التحميل…</div>;
@@ -104,14 +122,56 @@ function DashboardPage() {
             <h2 className="font-bold text-lg">أكمل بيانات مؤسستك</h2>
             <p className="text-sm text-muted-foreground mt-1">لكي تستطيع إضافة المنتجات والعروض.</p>
             <form onSubmit={saveSupplier} className="grid md:grid-cols-2 gap-3 mt-5">
-              <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="اسم المؤسسة / المتجر" className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="وصف مختصر (اختياري)" rows={2} className="md:col-span-2 resize-none rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <input required value={city} onChange={(e) => setCity(e.target.value)} placeholder="المدينة" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="العنوان (الحي/الشارع)" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} placeholder="رابط الموقع في خرائط قوقل" className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="رقم الهاتف" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <input required value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="رقم واتساب (بدون +)" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-              <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">حفظ</button>
+              <input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="اسم المؤسسة / المتجر"
+                className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="وصف مختصر (اختياري)"
+                rows={2}
+                className="md:col-span-2 resize-none rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <input
+                required
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="المدينة"
+                className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="العنوان (الحي/الشارع)"
+                className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <input
+                value={mapsUrl}
+                onChange={(e) => setMapsUrl(e.target.value)}
+                placeholder="رابط الموقع في خرائط قوقل"
+                className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <input
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="رقم الهاتف"
+                className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <input
+                required
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="رقم واتساب (بدون +)"
+                className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+              />
+              <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">
+                حفظ
+              </button>
             </form>
           </div>
         ) : (
@@ -128,48 +188,164 @@ function DashboardPage() {
                     )}
                   </div>
                   <div className="text-sm text-white/90 mt-2 flex items-center gap-3 flex-wrap">
-                    <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" />{supplier.city}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      {supplier.city}
+                    </span>
                     <Rating value={Number(supplier.rating)} count={supplier.reviews_count} />
-                    <span className="inline-flex items-center gap-1"><Calendar className="h-3 w-3" /> عضو منذ {supplier.joined_year}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Calendar className="h-3 w-3" /> عضو منذ {supplier.joined_year}
+                    </span>
                   </div>
                 </div>
-                <Link to="/product/$id" params={{ id: myProducts[0]?.product.id ?? "" }} className="hidden" />
+                <Link
+                  to="/product/$id"
+                  params={{ id: myProducts[0]?.product.id ?? "" }}
+                  className="hidden"
+                />
               </div>
             </div>
 
             <details className="mt-4 rounded-3xl bg-card border border-border p-5">
               <summary className="cursor-pointer font-bold text-sm">تعديل بيانات المتجر</summary>
               <form onSubmit={saveSupplier} className="grid md:grid-cols-2 gap-3 mt-4">
-                <input required value={name} onChange={(e) => setName(e.target.value)} placeholder="اسم المؤسسة / المتجر" className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="وصف مختصر (اختياري)" rows={2} className="md:col-span-2 resize-none rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <input required value={city} onChange={(e) => setCity(e.target.value)} placeholder="المدينة" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="العنوان (الحي/الشارع)" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} placeholder="رابط الموقع في خرائط قوقل" className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="رقم الهاتف" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <input required value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="رقم واتساب (بدون +)" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">حفظ التعديلات</button>
+                <input
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="اسم المؤسسة / المتجر"
+                  className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="وصف مختصر (اختياري)"
+                  rows={2}
+                  className="md:col-span-2 resize-none rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <input
+                  required
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="المدينة"
+                  className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <input
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="العنوان (الحي/الشارع)"
+                  className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <input
+                  value={mapsUrl}
+                  onChange={(e) => setMapsUrl(e.target.value)}
+                  placeholder="رابط الموقع في خرائط قوقل"
+                  className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <input
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="رقم الهاتف"
+                  className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <input
+                  required
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="رقم واتساب (بدون +)"
+                  className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                />
+                <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">
+                  حفظ التعديلات
+                </button>
               </form>
             </details>
 
+            <div className="mt-6">
+              <BulkImport supplierId={supplier.id} onDone={refetch} />
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-6 mt-6">
               <div className="rounded-3xl bg-card border border-border p-6">
-                <h3 className="font-bold text-lg flex items-center gap-2"><Plus className="h-5 w-5" /> إضافة منتج جديد</h3>
+                <h3 className="font-bold text-lg flex items-center gap-2">
+                  <Plus className="h-5 w-5" /> إضافة منتج جديد
+                </h3>
                 <form onSubmit={addProduct} className="grid grid-cols-2 gap-3 mt-4">
-                  <input required value={pname} onChange={(e) => setPname(e.target.value)} placeholder="اسم المنتج" className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                  <select required value={cat} onChange={(e) => setCat(e.target.value)} className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm">
+                  <input
+                    required
+                    value={pname}
+                    onChange={(e) => setPname(e.target.value)}
+                    placeholder="اسم المنتج"
+                    className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  />
+                  <select
+                    required
+                    value={cat}
+                    onChange={(e) => setCat(e.target.value)}
+                    className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  >
                     <option value="">اختر الفئة</option>
-                    {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
                   </select>
-                  <input required value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="وحدة البيع (مثلاً: كرتون)" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                  <input value={spec} onChange={(e) => setSpec(e.target.value)} placeholder="المواصفات" className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                  <input required type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="السعر (ر.س)" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
-                  <input required type="number" min="1" value={moq} onChange={(e) => setMoq(e.target.value)} placeholder="الحد الأدنى" className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm" />
+                  <input
+                    required
+                    value={unit}
+                    onChange={(e) => setUnit(e.target.value)}
+                    placeholder="وحدة البيع (مثلاً: كرتون)"
+                    className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  />
+                  <input
+                    value={spec}
+                    onChange={(e) => setSpec(e.target.value)}
+                    placeholder="المواصفات"
+                    className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  />
+                  <input
+                    required
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="السعر (ر.س)"
+                    className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  />
+                  <input
+                    required
+                    type="number"
+                    min="1"
+                    value={moq}
+                    onChange={(e) => setMoq(e.target.value)}
+                    placeholder="الحد الأدنى"
+                    className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                  />
                   <div className="col-span-2">
-                    <label className="block text-sm font-bold mb-1 text-muted-foreground">صورة المنتج (اختياري)</label>
-                    <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} className="w-full text-sm file:rounded-xl file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm file:font-bold" />
+                    <label className="block text-sm font-bold mb-1 text-muted-foreground">
+                      صورة المنتج (اختياري)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+                      className="w-full text-sm file:rounded-xl file:border-0 file:bg-secondary file:px-3 file:py-2 file:text-sm file:font-bold"
+                    />
                   </div>
-                  {err && <div className="col-span-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{err}</div>}
-                  <button disabled={adding} className="col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60">{adding ? "..." : "حفظ المنتج"}</button>
+                  {err && (
+                    <div className="col-span-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+                      {err}
+                    </div>
+                  )}
+                  <button
+                    disabled={adding}
+                    className="col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60"
+                  >
+                    {adding ? "..." : "حفظ المنتج"}
+                  </button>
                 </form>
               </div>
 
@@ -180,7 +356,9 @@ function DashboardPage() {
                     <SupplierProductRow key={row.id} row={row} onChange={refetch} />
                   ))}
                   {myProducts.length === 0 && (
-                    <div className="text-center text-sm text-muted-foreground py-6">لا توجد منتجات بعد.</div>
+                    <div className="text-center text-sm text-muted-foreground py-6">
+                      لا توجد منتجات بعد.
+                    </div>
                   )}
                 </div>
               </div>
