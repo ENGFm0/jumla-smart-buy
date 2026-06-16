@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { BadgeCheck, Trophy, MapPin, Lock } from "lucide-react";
+import { useState } from "react";
+import { BadgeCheck, Trophy, MapPin, Lock, ShoppingCart, Check } from "lucide-react";
 import { formatSAR, type OfferWithSupplier } from "@/types";
 import { useAuth } from "@/lib/auth";
+import { addToCart } from "@/lib/cart";
 import { Rating } from "./Rating";
 import { ContactButtons } from "./ContactButtons";
 import { RequestQuoteDialog } from "./RequestQuoteDialog";
@@ -12,21 +14,39 @@ export function OfferRow({
   minPrice,
   productId,
   productName,
+  unit,
 }: {
   offer: OfferWithSupplier;
   isBest: boolean;
   minPrice: number;
   productId: string;
   productName: string;
+  unit?: string | null;
 }) {
   const { user } = useAuth();
+  const [added, setAdded] = useState(false);
   const s = offer.supplier;
   const diff = offer.price - minPrice;
   const diffPct = minPrice > 0 ? Math.round((diff / minPrice) * 100) : 0;
+
+  function add() {
+    addToCart({
+      productId,
+      productName,
+      supplierId: s.id,
+      supplierName: s.name,
+      unit: unit ?? null,
+      quantity: offer.moq || 1,
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  }
   return (
     <div
       className={`rounded-3xl border p-4 md:p-5 transition ${
-        isBest ? "border-primary bg-brand-soft/40 shadow-md" : "border-border bg-card hover:border-primary/40"
+        isBest
+          ? "border-primary bg-brand-soft/40 shadow-md"
+          : "border-border bg-card hover:border-primary/40"
       }`}
     >
       <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -45,7 +65,9 @@ export function OfferRow({
                   {s.name}
                 </Link>
               ) : (
-                <span className="font-bold text-muted-foreground">مورّد (سجّل الدخول لعرض الاسم)</span>
+                <span className="font-bold text-muted-foreground">
+                  مورّد (سجّل الدخول لعرض الاسم)
+                </span>
               )}
               {s.verified && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-bold px-2 py-0.5">
@@ -94,6 +116,24 @@ export function OfferRow({
                 productName={productName}
                 supplierName={s.name}
               />
+              <button
+                onClick={add}
+                className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold transition border ${
+                  added
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                    : "bg-secondary border-border hover:bg-secondary/70"
+                }`}
+              >
+                {added ? (
+                  <>
+                    <Check className="h-4 w-4" /> أُضيف للسلة
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4" /> أضف للسلة
+                  </>
+                )}
+              </button>
             </>
           ) : (
             <Link

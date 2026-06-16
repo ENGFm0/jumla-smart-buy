@@ -33,7 +33,9 @@ function ProductPage() {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">جاري التحميل…</div>
+        <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">
+          جاري التحميل…
+        </div>
       </div>
     );
   }
@@ -41,8 +43,7 @@ function ProductPage() {
 
   const Icon = ((Icons as any)[data.icon] || Icons.Package) as typeof Icons.Package;
   const stats = data.stats;
-  const categoryName =
-    categories.find((c) => c.id === data.category_id)?.name ?? data.category_id;
+  const categoryName = categories.find((c) => c.id === data.category_id)?.name ?? data.category_id;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -66,9 +67,7 @@ function ProductPage() {
               </div>
             )}
             <div className="flex-1">
-              <div className="text-xs font-medium text-primary">
-                {categoryName}
-              </div>
+              <div className="text-xs font-medium text-primary">{categoryName}</div>
               <h1 className="text-2xl md:text-3xl font-extrabold mt-1">{data.name}</h1>
               {data.spec && <p className="text-muted-foreground mt-2">{data.spec}</p>}
               <div className="text-sm text-muted-foreground mt-2">
@@ -85,7 +84,9 @@ function ProductPage() {
               <PriceStat variant="high" value={stats.max_price} />
               <div className="rounded-2xl border bg-secondary/60 border-border px-3 py-2">
                 <div className="text-[11px] font-medium text-muted-foreground">عدد العروض</div>
-                <div className="text-sm font-extrabold tabular-nums mt-0.5">{stats.offers_count}</div>
+                <div className="text-sm font-extrabold tabular-nums mt-0.5">
+                  {stats.offers_count}
+                </div>
               </div>
             </div>
           )}
@@ -101,6 +102,7 @@ function ProductPage() {
               minPrice={Number(data.offers[0]?.price ?? 0)}
               productId={data.id}
               productName={data.name}
+              unit={data.unit}
             />
           ))}
           {data.offers.length === 0 && (
