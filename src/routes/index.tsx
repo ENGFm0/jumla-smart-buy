@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Truck, Package, BarChart3, MessagesSquare } from "lucide-react";
+import { Search, Truck, Package, BarChart3, MessagesSquare, PackageSearch } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CategoryChip } from "@/components/CategoryChip";
@@ -150,6 +150,15 @@ function Index() {
             جاري تحميل المنتجات…
           </div>
         )}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground mb-2">ما لقيت المنتج اللي تبيه؟</p>
+          <Link
+            to="/request-product"
+            className="inline-flex items-center gap-2 rounded-2xl border border-primary text-primary px-5 py-2.5 font-bold hover:bg-brand-soft transition"
+          >
+            <PackageSearch className="h-5 w-5" /> اطلب منتجاً غير متوفّر
+          </Link>
+        </div>
       </section>
 
       <Footer />

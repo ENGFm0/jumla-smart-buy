@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search as SearchIcon, PackageX } from "lucide-react";
+import { Search as SearchIcon, PackageX, PackageSearch } from "lucide-react";
 import { z } from "zod";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -126,6 +126,19 @@ function SearchPage() {
           </div>
         </div>
 
+        {/* طلب منتج غير متوفّر — متاح دائماً */}
+        <div className="mt-4 rounded-2xl border border-primary/30 bg-brand-soft/40 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+          <span className="text-sm font-bold">
+            ما لقيت المنتج اللي تبيه؟ اطلبه من الموردين وخلّهم يسعّرونه لك.
+          </span>
+          <Link
+            to="/request-product"
+            className="inline-flex items-center gap-2 rounded-2xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold shrink-0"
+          >
+            <PackageSearch className="h-4 w-4" /> اطلب منتجاً غير متوفّر
+          </Link>
+        </div>
+
         <div className="mt-6">
           {isLoading ? (
             <div className="text-center py-16 text-muted-foreground">جاري البحث…</div>
@@ -134,14 +147,8 @@ function SearchPage() {
               <PackageX className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="font-bold mt-3">لا توجد نتائج</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                ما لقيت المنتج؟ اطلبه من الموردين وخلّهم يسعّرونه لك.
+                جرّب كلمة أخرى أو غيّر الفئة — أو اطلبه من الموردين عبر الزر بالأعلى.
               </p>
-              <Link
-                to="/request-product"
-                className="inline-block mt-5 rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 font-bold"
-              >
-                اطلب منتجاً غير متوفّر
-              </Link>
             </div>
           ) : (
             <>
