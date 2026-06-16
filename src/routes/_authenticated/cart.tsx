@@ -87,8 +87,8 @@ function CartPage() {
         ) : (
           <div className="space-y-4">
             {groups.map((g) => {
-              const vat = g.subtotal * 0.15;
-              const total = g.subtotal + vat;
+              const total = g.subtotal; // الأسعار التي يضعها المورّد نهائية شاملة الضريبة
+              const vatIncluded = total - total / 1.15;
               return (
                 <div key={g.supplierId} className="rounded-3xl bg-card border border-border p-5">
                   <div className="flex items-center gap-2 font-bold mb-3">
@@ -157,19 +157,15 @@ function CartPage() {
                     ))}
                   </div>
 
-                  {/* الإجمالي */}
+                  {/* الإجمالي (الأسعار شاملة الضريبة) */}
                   <div className="mt-4 space-y-1 text-sm border-t border-border pt-3">
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>المجموع الفرعي</span>
-                      <span>{formatSAR(g.subtotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>ضريبة القيمة المضافة (15%)</span>
-                      <span>{formatSAR(vat)}</span>
-                    </div>
-                    <div className="flex justify-between font-extrabold text-base">
-                      <span>الإجمالي</span>
+                    <div className="flex justify-between items-center font-extrabold text-base">
+                      <span>الإجمالي (شامل الضريبة)</span>
                       <span className="text-primary">{formatSAR(total)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>منها ضريبة القيمة المضافة (15%)</span>
+                      <span>{formatSAR(vatIncluded)}</span>
                     </div>
                   </div>
 

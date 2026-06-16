@@ -19,8 +19,11 @@ export function OrderInvoice({ order }: { order: QuoteRequestDetailed }) {
     queryFn: () => getBuyerContact(order.buyer_id),
   });
 
+  // الأسعار التي يضعها المورّد نهائية شاملة الضريبة؛ نستخرج الضريبة منها بدل إضافتها.
   const unit = order.quoted_price != null ? Number(order.quoted_price) : 0;
-  const total = unit * order.quantity;
+  const total = unit * order.quantity; // الإجمالي شامل الضريبة
+  const net = total / 1.15; // قبل الضريبة
+  const vat = total - net; // الضريبة المتضمَّنة
 
   return (
     <div className="rounded-2xl border border-border bg-white p-4">
@@ -80,16 +83,16 @@ export function OrderInvoice({ order }: { order: QuoteRequestDetailed }) {
 
       <div className="space-y-1.5 border-t border-border pt-3 mt-1 text-sm">
         <div className="flex justify-between">
-          <span className="text-muted-foreground">المجموع الفرعي</span>
-          <span className="font-bold">{formatSAR(total)}</span>
+          <span className="text-muted-foreground">المجموع قبل الضريبة</span>
+          <span className="font-bold">{formatSAR(net)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
-          <span className="font-bold">{formatSAR(total * 0.15)}</span>
+          <span className="font-bold">{formatSAR(vat)}</span>
         </div>
         <div className="flex justify-between items-center border-t border-border pt-2 mt-1">
           <span className="font-bold">الإجمالي شامل الضريبة</span>
-          <span className="text-lg font-extrabold text-primary">{formatSAR(total * 1.15)}</span>
+          <span className="text-lg font-extrabold text-primary">{formatSAR(total)}</span>
         </div>
       </div>
     </div>
