@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, PackageX } from "lucide-react";
@@ -21,7 +21,10 @@ export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
       { title: "ابحث وقارن — مدد" },
-      { name: "description", content: "ابحث عن منتجك بالجملة وقارن بين أسعار جميع الموردين فوراً." },
+      {
+        name: "description",
+        content: "ابحث عن منتجك بالجملة وقارن بين أسعار جميع الموردين فوراً.",
+      },
     ],
   }),
   component: SearchPage,
@@ -130,13 +133,19 @@ function SearchPage() {
             <div className="rounded-3xl border border-dashed border-border p-16 text-center">
               <PackageX className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="font-bold mt-3">لا توجد نتائج</h3>
-              <p className="text-sm text-muted-foreground mt-1">جرّب كلمة أخرى أو غيّر الفئة.</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                ما لقيت المنتج؟ اطلبه من الموردين وخلّهم يسعّرونه لك.
+              </p>
+              <Link
+                to="/request-product"
+                className="inline-block mt-5 rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 font-bold"
+              >
+                اطلب منتجاً غير متوفّر
+              </Link>
             </div>
           ) : (
             <>
-              <div className="text-sm text-muted-foreground mb-3">
-                {sorted.length} منتج
-              </div>
+              <div className="text-sm text-muted-foreground mb-3">{sorted.length} منتج</div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sorted.map((p) => (
                   <ProductCard key={p.id} product={p} />

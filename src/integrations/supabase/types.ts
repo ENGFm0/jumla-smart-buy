@@ -156,12 +156,13 @@ export type Database = {
           cancelled_at: string | null
           courier_phone: string | null
           created_at: string
+          custom_product: string | null
           delivered_at: string | null
           id: string
           invoice_number: string | null
           note: string | null
           paid_at: string | null
-          product_id: string
+          product_id: string | null
           quantity: number
           quoted_at: string | null
           quoted_price: number | null
@@ -182,12 +183,13 @@ export type Database = {
           cancelled_at?: string | null
           courier_phone?: string | null
           created_at?: string
+          custom_product?: string | null
           delivered_at?: string | null
           id?: string
           invoice_number?: string | null
           note?: string | null
           paid_at?: string | null
-          product_id: string
+          product_id?: string | null
           quantity?: number
           quoted_at?: string | null
           quoted_price?: number | null
@@ -208,12 +210,13 @@ export type Database = {
           cancelled_at?: string | null
           courier_phone?: string | null
           created_at?: string
+          custom_product?: string | null
           delivered_at?: string | null
           id?: string
           invoice_number?: string | null
           note?: string | null
           paid_at?: string | null
-          product_id?: string
+          product_id?: string | null
           quantity?: number
           quoted_at?: string | null
           quoted_price?: number | null

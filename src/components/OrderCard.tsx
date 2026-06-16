@@ -9,7 +9,7 @@ import {
   Phone,
   RotateCcw,
 } from "lucide-react";
-import { respondToQuote, createQuoteRequest } from "@/lib/quotes";
+import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
 import {
   acceptOffer,
   markPaid,
@@ -54,7 +54,14 @@ export function OrderCard({
       {/* الترويسة */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h3 className="font-bold">{order.product?.name ?? "منتج"}</h3>
+          <h3 className="font-bold">
+            {order.product?.name ?? order.custom_product ?? "منتج"}
+            {!order.product && order.custom_product && (
+              <span className="mr-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground align-middle">
+                طلب خاص
+              </span>
+            )}
+          </h3>
           {role === "buyer" ? (
             <>
               <p className="text-sm text-muted-foreground mt-1">
@@ -178,11 +185,19 @@ function ReorderButton({ order, onChange }: { order: QuoteRequestDetailed; onCha
   async function reorder() {
     setBusy(true);
     try {
-      await createQuoteRequest({
-        productId: order.product_id,
-        supplierId: order.supplier_id,
-        quantity: order.quantity,
-      });
+      if (order.product_id) {
+        await createQuoteRequest({
+          productId: order.product_id,
+          supplierId: order.supplier_id,
+          quantity: order.quantity,
+        });
+      } else {
+        await createProductRequest({
+          customProduct: order.custom_product ?? "منتج",
+          quantity: order.quantity,
+          supplierIds: [order.supplier_id],
+        });
+      }
       setDone(true);
       onChange();
     } finally {

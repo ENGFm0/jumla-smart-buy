@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Inbox, ChevronDown, Store, ExternalLink } from "lucide-react";
+import { Inbox, ChevronDown, Store, ExternalLink, PackageSearch } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { OrderCard } from "@/components/OrderCard";
@@ -93,7 +93,15 @@ function MyRequestsPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8 flex-1">
-        <h1 className="text-2xl md:text-3xl font-extrabold mb-4">طلباتي</h1>
+        <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+          <h1 className="text-2xl md:text-3xl font-extrabold">طلباتي</h1>
+          <Link
+            to="/request-product"
+            className="inline-flex items-center gap-2 rounded-2xl border border-primary text-primary px-4 py-2 text-sm font-bold hover:bg-brand-soft transition"
+          >
+            <PackageSearch className="h-4 w-4" /> اطلب منتجاً غير متوفّر
+          </Link>
+        </div>
 
         {requests.length > 0 && <OrderTabs tab={tab} setTab={setTab} counts={counts} />}
 

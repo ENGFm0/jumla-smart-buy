@@ -10,6 +10,13 @@ export async function getCities(): Promise<string[]> {
   return Array.from(set).sort((a, b) => a.localeCompare(b, "ar"));
 }
 
+// قائمة مختصرة بكل الموردين (لاختيارهم عند طلب منتج غير متوفّر)
+export async function getAllSuppliers(): Promise<Pick<Supplier, "id" | "name" | "city">[]> {
+  const { data, error } = await supabase.from("suppliers").select("id, name, city").order("name");
+  if (error) throw error;
+  return (data ?? []) as Pick<Supplier, "id" | "name" | "city">[];
+}
+
 export async function getSupplierById(id: string): Promise<Supplier | null> {
   const { data, error } = await supabase.from("suppliers").select("*").eq("id", id).maybeSingle();
   if (error) throw error;

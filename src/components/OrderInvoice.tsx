@@ -65,7 +65,9 @@ export function OrderInvoice({ order }: { order: QuoteRequestDetailed }) {
         </thead>
         <tbody>
           <tr className="border-t border-border">
-            <td className="py-2 font-bold">{order.product?.name ?? "منتج"}</td>
+            <td className="py-2 font-bold">
+              {order.product?.name ?? order.custom_product ?? "منتج"}
+            </td>
             <td className="py-2 text-center">
               {order.quantity}
               {order.product?.unit ? ` ${order.product.unit}` : ""}

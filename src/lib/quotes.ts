@@ -22,6 +22,31 @@ export async function createQuoteRequest(input: {
   if (error) throw error;
 }
 
+// طلب منتج غير متوفّر: يُرسل لمورّد محدّد أو لكل الموردين (طلب لكل مورّد)
+export async function createProductRequest(input: {
+  customProduct: string;
+  quantity: number;
+  note?: string;
+  supplierIds: string[];
+}): Promise<number> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("يجب تسجيل الدخول لإرسال الطلب");
+  if (input.supplierIds.length === 0) throw new Error("اختر مورّداً واحداً على الأقل");
+  const rows = input.supplierIds.map((sid) => ({
+    buyer_id: user.id,
+    product_id: null,
+    custom_product: input.customProduct.trim(),
+    supplier_id: sid,
+    quantity: input.quantity,
+    note: input.note?.trim() || null,
+  }));
+  const { error } = await supabase.from("quote_requests").insert(rows);
+  if (error) throw error;
+  return rows.length;
+}
+
 // طلبات صاحب المحل الحالي
 export async function getMyQuoteRequests(): Promise<QuoteRequestDetailed[]> {
   const { data, error } = await supabase

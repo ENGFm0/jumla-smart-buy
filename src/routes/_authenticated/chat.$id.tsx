@@ -62,7 +62,8 @@ function ChatPage() {
               <div className="min-w-0">
                 <div className="font-bold truncate">{otherName}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1 truncate">
-                  <Package className="h-3 w-3" /> {order.product?.name ?? "طلب"}
+                  <Package className="h-3 w-3" />{" "}
+                  {order.product?.name ?? order.custom_product ?? "طلب"}
                 </div>
               </div>
             </div>
