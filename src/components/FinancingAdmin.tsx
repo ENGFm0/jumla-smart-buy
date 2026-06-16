@@ -4,6 +4,7 @@ import {
   getAllFinancing,
   updateFinancing,
   getFinancingDocUrl,
+  parseFinancingItems,
   FINANCING_STATUS_LABEL,
   type FinancingRequest,
   type FinancingStatus,
@@ -106,6 +107,29 @@ export function FinancingAdmin() {
               )}
               {r.promissory_no && <div>سند: {r.promissory_no}</div>}
             </div>
+            {(() => {
+              const items = parseFinancingItems(r);
+              if (items.length === 0) return null;
+              return (
+                <div className="mt-2 rounded-xl bg-secondary/40 p-2.5">
+                  <div className="text-xs font-bold mb-1">الأصناف المطلوبة ({items.length}):</div>
+                  <ul className="space-y-0.5 text-xs">
+                    {items.map((it, i) => (
+                      <li key={i} className="flex justify-between gap-2">
+                        <span className="truncate">
+                          {it.name}
+                          {it.supplier ? ` — ${it.supplier}` : ""} × {it.quantity}
+                          {it.unit ? ` ${it.unit}` : ""}
+                        </span>
+                        {it.price != null && (
+                          <span className="font-bold shrink-0">{formatSAR(Number(it.price))}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
             {r.details && <div className="text-sm mt-2">{r.details}</div>}
 
             <div className="flex flex-wrap items-center gap-2 mt-3">

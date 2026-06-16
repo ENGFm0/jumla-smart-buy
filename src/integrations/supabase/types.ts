@@ -161,6 +161,7 @@ export type Database = {
           id: string
           id_doc_path: string | null
           id_number: string | null
+          items: Json
           promissory_no: string | null
           status: string
           term_months: number | null
@@ -179,6 +180,7 @@ export type Database = {
           id?: string
           id_doc_path?: string | null
           id_number?: string | null
+          items?: Json
           promissory_no?: string | null
           status?: string
           term_months?: number | null
@@ -197,6 +199,7 @@ export type Database = {
           id?: string
           id_doc_path?: string | null
           id_number?: string | null
+          items?: Json
           promissory_no?: string | null
           status?: string
           term_months?: number | null

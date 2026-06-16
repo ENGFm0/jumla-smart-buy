@@ -2,6 +2,25 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 export type FinancingRequest = Tables<"financing_requests">;
+
+// صنف مرفق بطلب التمويل (من السلة / يدوي / تسعيرة مورّد)
+export type FinancingItem = {
+  name: string;
+  supplier?: string | null;
+  quantity: number;
+  unit?: string | null;
+  price?: number | null;
+};
+
+export function parseFinancingItems(r: FinancingRequest): FinancingItem[] {
+  const v = r.items;
+  return Array.isArray(v) ? (v as unknown as FinancingItem[]) : [];
+}
+
+export function financingItemsTotal(items: FinancingItem[]): number {
+  return items.reduce((sum, it) => sum + (Number(it.price) || 0) * (it.quantity || 0), 0);
+}
+
 export type FinancingStatus =
   | "pending"
   | "approved"
@@ -29,6 +48,7 @@ export async function createFinancingRequest(input: {
   details?: string;
   idDocPath?: string | null;
   crDocPath?: string | null;
+  items?: FinancingItem[];
 }) {
   const {
     data: { user },
@@ -44,6 +64,7 @@ export async function createFinancingRequest(input: {
     details: input.details?.trim() || null,
     id_doc_path: input.idDocPath ?? null,
     cr_doc_path: input.crDocPath ?? null,
+    items: (input.items ?? []) as unknown as FinancingRequest["items"],
   });
   if (error) throw error;
 }
