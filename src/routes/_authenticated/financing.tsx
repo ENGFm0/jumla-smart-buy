@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -28,6 +28,7 @@ import {
 } from "@/lib/financing";
 import { useCart } from "@/lib/cart";
 import { getMyQuoteRequests } from "@/lib/quotes";
+import { getProductsWithStats } from "@/lib/products";
 import { formatSAR } from "@/types";
 
 export const Route = createFileRoute("/_authenticated/financing")({
@@ -115,7 +116,13 @@ function FinancingPage() {
   const [idDocPath, setIdDocPath] = useState<string | null>(initial.idDocPath);
   const [crDocPath, setCrDocPath] = useState<string | null>(initial.crDocPath);
 
-  const [source, setSource] = useState<"offers" | "cart" | null>(null);
+  const [source, setSource] = useState<"offers" | "cart" | "search" | null>(null);
+  const [searchQ, setSearchQ] = useState("");
+  const { data: searchResults = [], isFetching: searching } = useQuery({
+    queryKey: ["financing-product-search", searchQ],
+    queryFn: () => getProductsWithStats({ search: searchQ.trim() }),
+    enabled: source === "search" && searchQ.trim().length >= 2,
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -353,13 +360,12 @@ function FinancingPage() {
                   disabled={cart.length === 0}
                   onClick={() => setSource((s) => (s === "cart" ? null : "cart"))}
                 />
-                <Link
-                  to="/search"
-                  className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-border p-3 text-xs font-bold hover:bg-secondary transition"
-                >
-                  <Search className="h-5 w-5" />
-                  يدوي (بحث)
-                </Link>
+                <SourceChip
+                  icon={Search}
+                  label="بحث المنتجات"
+                  active={source === "search"}
+                  onClick={() => setSource((s) => (s === "search" ? null : "search"))}
+                />
               </div>
 
               {/* محتوى المصدر المختار */}
@@ -403,6 +409,53 @@ function FinancingPage() {
                       }
                     />
                   ))}
+                </div>
+              )}
+              {source === "search" && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2">
+                    <Search className="h-4 w-4 text-muted-foreground" />
+                    <input
+                      value={searchQ}
+                      onChange={(e) => setSearchQ(e.target.value)}
+                      placeholder="ابحث عن منتج لإضافته…"
+                      className="flex-1 bg-transparent outline-none text-sm"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="space-y-1 max-h-56 overflow-y-auto">
+                    {searchQ.trim().length < 2 ? (
+                      <p className="text-xs text-muted-foreground py-2">
+                        اكتب حرفين على الأقل للبحث.
+                      </p>
+                    ) : searching ? (
+                      <p className="text-xs text-muted-foreground py-2">جارٍ البحث…</p>
+                    ) : searchResults.length === 0 ? (
+                      <p className="text-xs text-muted-foreground py-2">لا نتائج مطابقة.</p>
+                    ) : (
+                      searchResults.map((p) => (
+                        <PickRow
+                          key={p.id}
+                          title={p.name}
+                          sub={
+                            p.stats
+                              ? `${p.stats.offers_count} عرض · يبدأ من ${formatSAR(Number(p.stats.min_price))}`
+                              : (p.unit ?? "")
+                          }
+                          price={p.stats ? Number(p.stats.min_price) : null}
+                          onAdd={() =>
+                            addItem({
+                              name: p.name,
+                              supplier: p.cheapest_supplier?.name ?? null,
+                              quantity: 1,
+                              unit: p.unit,
+                              price: p.stats ? Number(p.stats.min_price) : null,
+                            })
+                          }
+                        />
+                      ))
+                    )}
+                  </div>
                 </div>
               )}
 
