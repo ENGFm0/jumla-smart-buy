@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SupplierIdRouteImport } from './routes/supplier.$id'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as AuthenticatedRequestProductRouteImport } from './routes/_authenticated/request-product'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMyRequestsRouteImport } from './routes/_authenticated/my-requests'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
@@ -65,6 +66,12 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRequestProductRoute =
+  AuthenticatedRequestProductRouteImport.update({
+    id: '/request-product',
+    path: '/request-product',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -119,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/request-product': typeof AuthenticatedRequestProductRoute
   '/product/$id': typeof ProductIdRoute
   '/supplier/$id': typeof SupplierIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
@@ -136,6 +144,7 @@ export interface FileRoutesByTo {
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/request-product': typeof AuthenticatedRequestProductRoute
   '/product/$id': typeof ProductIdRoute
   '/supplier/$id': typeof SupplierIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
@@ -155,6 +164,7 @@ export interface FileRoutesById {
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/my-requests': typeof AuthenticatedMyRequestsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/request-product': typeof AuthenticatedRequestProductRoute
   '/product/$id': typeof ProductIdRoute
   '/supplier/$id': typeof SupplierIdRoute
   '/_authenticated/chat/$id': typeof AuthenticatedChatIdRoute
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/my-requests'
     | '/onboarding'
+    | '/request-product'
     | '/product/$id'
     | '/supplier/$id'
     | '/chat/$id'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/my-requests'
     | '/onboarding'
+    | '/request-product'
     | '/product/$id'
     | '/supplier/$id'
     | '/chat/$id'
@@ -209,6 +221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/favorites'
     | '/_authenticated/my-requests'
     | '/_authenticated/onboarding'
+    | '/_authenticated/request-product'
     | '/product/$id'
     | '/supplier/$id'
     | '/_authenticated/chat/$id'
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/request-product': {
+      id: '/_authenticated/request-product'
+      path: '/request-product'
+      fullPath: '/request-product'
+      preLoaderRoute: typeof AuthenticatedRequestProductRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -350,6 +370,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedMyRequestsRoute: typeof AuthenticatedMyRequestsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedRequestProductRoute: typeof AuthenticatedRequestProductRoute
   AuthenticatedChatIdRoute: typeof AuthenticatedChatIdRoute
 }
 
@@ -361,6 +382,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedMyRequestsRoute: AuthenticatedMyRequestsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedRequestProductRoute: AuthenticatedRequestProductRoute,
   AuthenticatedChatIdRoute: AuthenticatedChatIdRoute,
 }
 
