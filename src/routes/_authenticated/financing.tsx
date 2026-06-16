@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -10,9 +10,6 @@ import {
   Trash2,
   ShoppingCart,
   Tag,
-  Search,
-  Store,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
@@ -30,8 +27,6 @@ import {
 } from "@/lib/financing";
 import { useCart } from "@/lib/cart";
 import { getMyQuoteRequests } from "@/lib/quotes";
-import { getProductsWithStats, getProductsBySupplier } from "@/lib/products";
-import { getAllSuppliers } from "@/lib/suppliers";
 import { formatSAR } from "@/types";
 
 export const Route = createFileRoute("/_authenticated/financing")({
@@ -119,29 +114,7 @@ function FinancingPage() {
   const [idDocPath, setIdDocPath] = useState<string | null>(initial.idDocPath);
   const [crDocPath, setCrDocPath] = useState<string | null>(initial.crDocPath);
 
-  const [source, setSource] = useState<"offers" | "cart" | "search" | null>(null);
-  const [searchQ, setSearchQ] = useState("");
-  const [expandedSupplier, setExpandedSupplier] = useState<string | null>(null);
-  const { data: searchResults = [], isFetching: searching } = useQuery({
-    queryKey: ["financing-product-search", searchQ],
-    queryFn: () => getProductsWithStats({ search: searchQ.trim() }),
-    enabled: source === "search" && searchQ.trim().length >= 2,
-  });
-  const { data: allSuppliers = [] } = useQuery({
-    queryKey: ["all-suppliers"],
-    queryFn: getAllSuppliers,
-    enabled: source === "search",
-  });
-  const { data: supplierProducts = [], isFetching: loadingSupplierProducts } = useQuery({
-    queryKey: ["supplier-products", expandedSupplier],
-    queryFn: () => getProductsBySupplier(expandedSupplier!),
-    enabled: !!expandedSupplier,
-  });
-  const q = searchQ.trim();
-  const supplierMatches =
-    q.length >= 2
-      ? allSuppliers.filter((s) => s.name.includes(q) || (s.city ?? "").includes(q)).slice(0, 8)
-      : [];
+  const [source, setSource] = useState<"offers" | "cart" | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -364,7 +337,7 @@ function FinancingPage() {
               </p>
 
               {/* مصادر الأصناف جنب بعض */}
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <SourceChip
                   icon={Tag}
                   label="العروض"
@@ -376,14 +349,7 @@ function FinancingPage() {
                   icon={ShoppingCart}
                   label="السلة"
                   active={source === "cart"}
-                  disabled={cart.length === 0}
                   onClick={() => setSource((s) => (s === "cart" ? null : "cart"))}
-                />
-                <SourceChip
-                  icon={Search}
-                  label="بحث المنتجات"
-                  active={source === "search"}
-                  onClick={() => setSource((s) => (s === "search" ? null : "search"))}
                 />
               </div>
 
@@ -409,156 +375,47 @@ function FinancingPage() {
                   ))}
                 </div>
               )}
-              {source === "cart" && (
-                <div className="space-y-1 max-h-56 overflow-y-auto">
-                  {cart.map((c) => (
-                    <PickRow
-                      key={c.productId + c.supplierId}
-                      title={`${c.productName} — ${c.supplierName}`}
-                      sub={`الكمية ${c.quantity}${c.unit ? ` ${c.unit}` : ""}`}
-                      price={c.price}
-                      onAdd={() =>
-                        addItem({
-                          name: c.productName,
-                          supplier: c.supplierName,
-                          quantity: c.quantity,
-                          unit: c.unit,
-                          price: c.price ?? null,
-                        })
-                      }
-                    />
-                  ))}
-                </div>
-              )}
-              {source === "search" && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 rounded-2xl border border-border bg-background px-3 py-2">
-                    <Search className="h-4 w-4 text-muted-foreground" />
-                    <input
-                      value={searchQ}
-                      onChange={(e) => setSearchQ(e.target.value)}
-                      placeholder="ابحث عن شركة أو منتج…"
-                      className="flex-1 bg-transparent outline-none text-sm"
-                      autoFocus
-                    />
-                  </div>
-
-                  {q.length < 2 ? (
-                    <p className="text-xs text-muted-foreground py-2">
-                      اكتب حرفين على الأقل للبحث في الشركات والمنتجات.
+              {source === "cart" &&
+                (cart.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border p-5 text-center">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      سلتك فارغة — تصفّح المنتجات وأضفها للسلة، ثم ارجع هنا لاختيارها.
                     </p>
-                  ) : (
-                    <div className="space-y-3 max-h-72 overflow-y-auto">
-                      {/* الشركات */}
-                      {supplierMatches.length > 0 && (
-                        <div>
-                          <div className="text-xs font-bold text-muted-foreground mb-1">
-                            الشركات
-                          </div>
-                          <div className="space-y-1">
-                            {supplierMatches.map((s) => (
-                              <div key={s.id}>
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    setExpandedSupplier((id) => (id === s.id ? null : s.id))
-                                  }
-                                  className="w-full flex items-center gap-2 rounded-xl border border-border px-2.5 py-2 text-sm hover:border-primary"
-                                >
-                                  <Store className="h-4 w-4 text-primary shrink-0" />
-                                  <span className="font-bold truncate flex-1 text-right">
-                                    {s.name}
-                                    {s.city ? ` — ${s.city}` : ""}
-                                  </span>
-                                  <ChevronDown
-                                    className={`h-4 w-4 shrink-0 transition-transform ${expandedSupplier === s.id ? "rotate-180" : ""}`}
-                                  />
-                                </button>
-                                {expandedSupplier === s.id && (
-                                  <div className="pr-3 mt-1 space-y-1">
-                                    {loadingSupplierProducts ? (
-                                      <p className="text-xs text-muted-foreground py-1">
-                                        جارٍ التحميل…
-                                      </p>
-                                    ) : supplierProducts.length === 0 ? (
-                                      <p className="text-xs text-muted-foreground py-1">
-                                        لا منتجات لهذه الشركة.
-                                      </p>
-                                    ) : (
-                                      supplierProducts.map((row) => (
-                                        <PickRow
-                                          key={row.id}
-                                          title={row.product.name}
-                                          sub={`الحد الأدنى ${row.moq}${row.product.unit ? ` ${row.product.unit}` : ""}`}
-                                          price={Number(row.price)}
-                                          onAdd={() =>
-                                            addItem({
-                                              name: row.product.name,
-                                              supplier: s.name,
-                                              quantity: row.moq || 1,
-                                              unit: row.product.unit,
-                                              price: Number(row.price),
-                                            })
-                                          }
-                                        />
-                                      ))
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* المنتجات */}
-                      <div>
-                        <div className="text-xs font-bold text-muted-foreground mb-1">المنتجات</div>
-                        {searching ? (
-                          <p className="text-xs text-muted-foreground py-1">جارٍ البحث…</p>
-                        ) : searchResults.length === 0 ? (
-                          <p className="text-xs text-muted-foreground py-1">لا منتجات مطابقة.</p>
-                        ) : (
-                          <div className="space-y-1">
-                            {searchResults.map((p) => (
-                              <PickRow
-                                key={p.id}
-                                title={p.name}
-                                sub={
-                                  p.stats
-                                    ? `${p.stats.offers_count} عرض · يبدأ من ${formatSAR(Number(p.stats.min_price))}`
-                                    : (p.unit ?? "")
-                                }
-                                price={p.stats ? Number(p.stats.min_price) : null}
-                                onAdd={() =>
-                                  addItem({
-                                    name: p.name,
-                                    supplier: p.cheapest_supplier?.name ?? null,
-                                    quantity: 1,
-                                    unit: p.unit,
-                                    price: p.stats ? Number(p.stats.min_price) : null,
-                                  })
-                                }
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {supplierMatches.length === 0 && searchResults.length === 0 && !searching && (
-                        <p className="text-xs text-muted-foreground py-1">لا نتائج مطابقة.</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+                    <Link
+                      to="/search"
+                      className="inline-block rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold"
+                    >
+                      تصفّح المنتجات
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-1 max-h-56 overflow-y-auto">
+                    {cart.map((c) => (
+                      <PickRow
+                        key={c.productId + c.supplierId}
+                        title={`${c.productName} — ${c.supplierName}`}
+                        sub={`الكمية ${c.quantity}${c.unit ? ` ${c.unit}` : ""}`}
+                        price={c.price}
+                        onAdd={() =>
+                          addItem({
+                            name: c.productName,
+                            supplier: c.supplierName,
+                            quantity: c.quantity,
+                            unit: c.unit,
+                            price: c.price ?? null,
+                          })
+                        }
+                      />
+                    ))}
+                  </div>
+                ))}
 
               {/* المختارة */}
               <div className="rounded-2xl bg-secondary/40 p-3">
                 <div className="text-sm font-bold mb-2">المنتجات المختارة ({items.length})</div>
                 {items.length === 0 ? (
                   <p className="text-xs text-muted-foreground">
-                    لم تختر أي صنف بعد — اختر من العروض أو السلة، أو أضف عبر البحث.
+                    لم تختر أي صنف بعد — اختر من العروض أو من سلتك.
                   </p>
                 ) : (
                   <div className="space-y-1.5">
