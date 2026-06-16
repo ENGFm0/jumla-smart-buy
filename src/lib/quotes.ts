@@ -22,6 +22,31 @@ export async function createQuoteRequest(input: {
   if (error) throw error;
 }
 
+// شراء مباشر بالسعر المعروض: يُنشئ طلبات مسعّرة ومقبولة جاهزة للدفع (بلا تفاوض)
+export async function createDirectOrders(
+  items: { productId: string; supplierId: string; quantity: number; price: number }[],
+): Promise<number> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("يجب تسجيل الدخول");
+  if (items.length === 0) return 0;
+  const now = new Date().toISOString();
+  const rows = items.map((it) => ({
+    buyer_id: user.id,
+    product_id: it.productId,
+    supplier_id: it.supplierId,
+    quantity: it.quantity,
+    quoted_price: it.price,
+    quoted_at: now,
+    status: "quoted" as const,
+    accepted_at: now,
+  }));
+  const { error } = await supabase.from("quote_requests").insert(rows);
+  if (error) throw error;
+  return rows.length;
+}
+
 // طلب منتج غير متوفّر: يُرسل لمورّد محدّد أو لكل الموردين (طلب لكل مورّد)
 export async function createProductRequest(input: {
   customProduct: string;

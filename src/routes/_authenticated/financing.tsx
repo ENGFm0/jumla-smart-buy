@@ -86,7 +86,7 @@ function FinancingPage() {
         supplier: c.supplierName,
         quantity: c.quantity,
         unit: c.unit,
-        price: null,
+        price: c.price ?? null,
       })),
     ]);
   }

@@ -1,13 +1,14 @@
 import { useSyncExternalStore } from "react";
 
-// سلة محلية (localStorage) — تجمع منتجات قبل إرسالها كطلبات عروض أسعار.
-// لا تمسّ قاعدة البيانات؛ الإرسال يُنشئ طلبات (quote_requests) عادية.
+// سلة محلية (localStorage) للشراء المباشر بالسعر المعروض.
+// عند الإتمام تُنشأ طلبات شراء مسعّرة ومقبولة جاهزة للدفع (وليست عروض أسعار).
 export type CartItem = {
   productId: string;
   productName: string;
   supplierId: string;
   supplierName: string;
   unit: string | null;
+  price: number; // سعر الوحدة المعروض
   quantity: number;
 };
 

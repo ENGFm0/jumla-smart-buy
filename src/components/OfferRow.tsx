@@ -36,6 +36,7 @@ export function OfferRow({
       supplierId: s.id,
       supplierName: s.name,
       unit: unit ?? null,
+      price: Number(offer.price),
       quantity: offer.moq || 1,
     });
     setAdded(true);
