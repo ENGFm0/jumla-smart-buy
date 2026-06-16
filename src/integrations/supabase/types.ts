@@ -147,6 +147,63 @@ export type Database = {
           },
         ]
       }
+      financing_requests: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          business_name: string | null
+          buyer_id: string
+          cr_doc_path: string | null
+          cr_number: string | null
+          created_at: string
+          credit_limit: number | null
+          details: string | null
+          id: string
+          id_doc_path: string | null
+          id_number: string | null
+          promissory_no: string | null
+          status: string
+          term_months: number | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount: number
+          business_name?: string | null
+          buyer_id: string
+          cr_doc_path?: string | null
+          cr_number?: string | null
+          created_at?: string
+          credit_limit?: number | null
+          details?: string | null
+          id?: string
+          id_doc_path?: string | null
+          id_number?: string | null
+          promissory_no?: string | null
+          status?: string
+          term_months?: number | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          business_name?: string | null
+          buyer_id?: string
+          cr_doc_path?: string | null
+          cr_number?: string | null
+          created_at?: string
+          credit_limit?: number | null
+          details?: string | null
+          id?: string
+          id_doc_path?: string | null
+          id_number?: string | null
+          promissory_no?: string | null
+          status?: string
+          term_months?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quote_requests: {
         Row: {
           accepted_at: string | null

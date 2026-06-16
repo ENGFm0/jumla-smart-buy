@@ -20,6 +20,7 @@ import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedRequestProductRouteImport } from './routes/_authenticated/request-product'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMyRequestsRouteImport } from './routes/_authenticated/my-requests'
+import { Route as AuthenticatedFinancingRouteImport } from './routes/_authenticated/financing'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
@@ -82,6 +83,11 @@ const AuthenticatedMyRequestsRoute = AuthenticatedMyRequestsRouteImport.update({
   path: '/my-requests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinancingRoute = AuthenticatedFinancingRouteImport.update({
+  id: '/financing',
+  path: '/financing',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/cart': typeof AuthenticatedCartRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/financing': typeof AuthenticatedFinancingRoute
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/request-product': typeof AuthenticatedRequestProductRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/cart': typeof AuthenticatedCartRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
+  '/financing': typeof AuthenticatedFinancingRoute
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/request-product': typeof AuthenticatedRequestProductRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
+  '/_authenticated/financing': typeof AuthenticatedFinancingRoute
   '/_authenticated/my-requests': typeof AuthenticatedMyRequestsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/request-product': typeof AuthenticatedRequestProductRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/cart'
     | '/dashboard'
     | '/favorites'
+    | '/financing'
     | '/my-requests'
     | '/onboarding'
     | '/request-product'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/cart'
     | '/dashboard'
     | '/favorites'
+    | '/financing'
     | '/my-requests'
     | '/onboarding'
     | '/request-product'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cart'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
+    | '/_authenticated/financing'
     | '/_authenticated/my-requests'
     | '/_authenticated/onboarding'
     | '/_authenticated/request-product'
@@ -317,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financing': {
+      id: '/_authenticated/financing'
+      path: '/financing'
+      fullPath: '/financing'
+      preLoaderRoute: typeof AuthenticatedFinancingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/favorites': {
       id: '/_authenticated/favorites'
       path: '/favorites'
@@ -368,6 +387,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCartRoute: typeof AuthenticatedCartRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
+  AuthenticatedFinancingRoute: typeof AuthenticatedFinancingRoute
   AuthenticatedMyRequestsRoute: typeof AuthenticatedMyRequestsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRequestProductRoute: typeof AuthenticatedRequestProductRoute
@@ -380,6 +400,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCartRoute: AuthenticatedCartRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
+  AuthenticatedFinancingRoute: AuthenticatedFinancingRoute,
   AuthenticatedMyRequestsRoute: AuthenticatedMyRequestsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRequestProductRoute: AuthenticatedRequestProductRoute,

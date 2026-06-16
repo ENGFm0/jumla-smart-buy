@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { FinancingAdmin } from "@/components/FinancingAdmin";
 import { useAuth, getUserRoles } from "@/lib/auth";
 import {
   getAdminStats,
@@ -64,7 +65,9 @@ function AdminPage() {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">جاري التحميل…</div>
+        <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">
+          جاري التحميل…
+        </div>
       </div>
     );
   }
@@ -77,9 +80,7 @@ function AdminPage() {
           <div className="max-w-md mx-auto text-center rounded-3xl border border-border p-10">
             <ShieldAlert className="h-12 w-12 mx-auto text-rose-500" />
             <h1 className="font-extrabold text-xl mt-3">غير مصرّح</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              هذه الصفحة مخصّصة للإدارة فقط.
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">هذه الصفحة مخصّصة للإدارة فقط.</p>
           </div>
         </main>
         <Footer />
@@ -95,19 +96,33 @@ function AdminPage() {
 
         {/* الإحصائيات */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
-          <StatCard icon={<Building2 className="h-5 w-5" />} label="الموردون" value={stats?.suppliers} />
-          <StatCard icon={<Package className="h-5 w-5" />} label="المنتجات" value={stats?.products} />
+          <StatCard
+            icon={<Building2 className="h-5 w-5" />}
+            label="الموردون"
+            value={stats?.suppliers}
+          />
+          <StatCard
+            icon={<Package className="h-5 w-5" />}
+            label="المنتجات"
+            value={stats?.products}
+          />
           <StatCard icon={<Tag className="h-5 w-5" />} label="العروض" value={stats?.offers} />
           <StatCard icon={<FileText className="h-5 w-5" />} label="الطلبات" value={stats?.quotes} />
           <StatCard icon={<Users className="h-5 w-5" />} label="المستخدمون" value={stats?.users} />
         </div>
+
+        {/* طلبات التمويل (الشراء بالآجل) */}
+        <FinancingAdmin />
 
         {/* الموردون */}
         <section className="rounded-3xl bg-card border border-border p-6 mb-6">
           <h2 className="font-bold text-lg mb-4">الموردون ({suppliers.length})</h2>
           <div className="space-y-2">
             {suppliers.map((s) => (
-              <div key={s.id} className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3">
+              <div
+                key={s.id}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+              >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold truncate">{s.name}</span>
@@ -117,10 +132,15 @@ function AdminPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground">{s.city} • {s.phone}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {s.city} • {s.phone}
+                  </div>
                 </div>
                 <button
-                  onClick={async () => { await setSupplierVerified(s.id, !s.verified); refresh(); }}
+                  onClick={async () => {
+                    await setSupplierVerified(s.id, !s.verified);
+                    refresh();
+                  }}
                   className="rounded-xl border border-border px-3 py-1.5 text-xs font-bold hover:bg-secondary"
                 >
                   {s.verified ? "إلغاء التوثيق" : "توثيق"}
@@ -150,7 +170,10 @@ function AdminPage() {
           <h2 className="font-bold text-lg mb-4">المنتجات ({products.length})</h2>
           <div className="space-y-2">
             {products.map((p) => (
-              <div key={p.id} className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3">
+              <div
+                key={p.id}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+              >
                 <div className="min-w-0 flex-1">
                   <div className="font-bold truncate">{p.name}</div>
                   <div className="text-xs text-muted-foreground">
@@ -182,7 +205,15 @@ function AdminPage() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value?: number }) {
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value?: number;
+}) {
   return (
     <div className="rounded-2xl bg-card border border-border p-4">
       <div className="flex items-center gap-2 text-muted-foreground text-sm">

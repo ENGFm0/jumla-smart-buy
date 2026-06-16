@@ -55,9 +55,15 @@ function CartPage() {
         <h1 className="text-2xl md:text-3xl font-extrabold mb-2 flex items-center gap-2">
           <ShoppingCart className="h-6 w-6" /> السلة
         </h1>
-        <p className="text-sm text-muted-foreground mb-6">
+        <p className="text-sm text-muted-foreground mb-3">
           تُرسَل منتجات كل مورّد كطلبات عروض أسعار، ثم تتابعها في «طلباتي».
         </p>
+        <Link
+          to="/financing"
+          className="inline-flex items-center gap-2 rounded-2xl border border-primary text-primary px-4 py-2 text-sm font-bold hover:bg-brand-soft transition mb-6"
+        >
+          أو اشترِ بالآجل عبر مدد ←
+        </Link>
 
         {items.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-border p-16 text-center">
