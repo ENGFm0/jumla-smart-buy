@@ -679,14 +679,25 @@ function DocUpload({
   error: string | null;
 }) {
   const [busy, setBusy] = useState(false);
+  const [uploadErr, setUploadErr] = useState<string | null>(null);
   async function pick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    setUploadErr(null);
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadErr("الملف كبير جداً (الحد 10MB)");
+      return;
+    }
     setBusy(true);
     try {
       const p = await uploadFinancingDoc(file, kind);
       onUploaded(p);
+    } catch (err: any) {
+      const msg = err?.message ?? "تعذّر الرفع";
+      setUploadErr(
+        /bucket/i.test(msg) ? "مخزن المستندات غير مُهيّأ بعد (طبّق migration التمويل)" : msg,
+      );
     } finally {
       setBusy(false);
     }
@@ -714,6 +725,7 @@ function DocUpload({
         </span>
         <input type="file" accept="image/*,application/pdf" className="hidden" onChange={pick} />
       </label>
+      {uploadErr && <div className="text-xs text-rose-600 font-bold mt-1">{uploadErr}</div>}
     </div>
   );
 }
