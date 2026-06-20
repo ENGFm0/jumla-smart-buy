@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   Category,
   PriceStats,
+  PriceTier,
   Product,
   ProductDetail,
   ProductWithStats,
@@ -147,6 +148,7 @@ export async function getProductsBySupplier(supplierId: string) {
     price: number;
     moq: number;
     stock: number | null;
+    price_tiers: unknown;
     product: Product;
   }>;
 }
@@ -173,6 +175,7 @@ export async function addProductOffer(input: {
   price: number;
   moq: number;
   stock?: number | null;
+  priceTiers?: PriceTier[] | null;
   imageUrl?: string | null;
 }) {
   const { data: product, error: prodErr } = await supabase
@@ -194,6 +197,7 @@ export async function addProductOffer(input: {
     price: input.price,
     moq: input.moq,
     stock: input.stock ?? null,
+    price_tiers: (input.priceTiers ?? null) as unknown as never,
   });
   if (offerErr) throw offerErr;
   return product;
@@ -204,10 +208,16 @@ export async function editOffer(
   price: number,
   moq: number,
   stock?: number | null,
+  priceTiers?: PriceTier[] | null,
 ) {
   const { error } = await supabase
     .from("offers")
-    .update({ price, moq, ...(stock !== undefined ? { stock } : {}) })
+    .update({
+      price,
+      moq,
+      ...(stock !== undefined ? { stock } : {}),
+      ...(priceTiers !== undefined ? { price_tiers: priceTiers as unknown as never } : {}),
+    })
     .eq("id", offerId);
   if (error) throw error;
 }

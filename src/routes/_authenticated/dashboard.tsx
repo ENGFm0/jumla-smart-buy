@@ -8,6 +8,8 @@ import { Rating } from "@/components/Rating";
 import { IncomingQuotes } from "@/components/IncomingQuotes";
 import { BulkImport } from "@/components/BulkImport";
 import { SupplierProductRow } from "@/components/SupplierProductRow";
+import { PriceTiersEditor, cleanTiers } from "@/components/PriceTiersEditor";
+import type { PriceTier } from "@/types";
 import { useAuth } from "@/lib/auth";
 import { getSupplierByUserId, upsertSupplier } from "@/lib/suppliers";
 import {
@@ -75,6 +77,7 @@ function DashboardPage() {
   const [price, setPrice] = useState("");
   const [moq, setMoq] = useState("1");
   const [stock, setStock] = useState("");
+  const [tiers, setTiers] = useState<PriceTier[]>([]);
   const [newCatMode, setNewCatMode] = useState(false);
   const [newCat, setNewCat] = useState("");
   const [image, setImage] = useState<File | null>(null);
@@ -106,6 +109,7 @@ function DashboardPage() {
         price: Number(price),
         moq: Number(moq),
         stock: stock.trim() === "" ? null : Math.max(0, Number(stock) || 0),
+        priceTiers: cleanTiers(tiers).length ? cleanTiers(tiers) : null,
         imageUrl,
       });
       setPname("");
@@ -114,6 +118,7 @@ function DashboardPage() {
       setPrice("");
       setMoq("1");
       setStock("");
+      setTiers([]);
       setNewCat("");
       setNewCatMode(false);
       setImage(null);
@@ -374,6 +379,9 @@ function DashboardPage() {
                     title="اتركه فارغاً إذا ما تبي تتبّع المخزون. ينقص تلقائياً عند التوصيل، وتُنبَّه إذا قلّ عن 10."
                     className="col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
                   />
+                  <div className="col-span-2">
+                    <PriceTiersEditor tiers={tiers} onChange={setTiers} unit={unit} />
+                  </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-bold mb-1 text-muted-foreground">
                       صورة المنتج (اختياري)

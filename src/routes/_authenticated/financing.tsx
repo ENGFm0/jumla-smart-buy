@@ -27,7 +27,7 @@ import {
 } from "@/lib/financing";
 import { useCart } from "@/lib/cart";
 import { getMyQuoteRequests } from "@/lib/quotes";
-import { formatSAR } from "@/types";
+import { formatSAR, unitPriceForQty } from "@/types";
 
 export const Route = createFileRoute("/_authenticated/financing")({
   head: () => ({ meta: [{ title: "الشراء بالآجل — مدد" }] }),
@@ -390,23 +390,26 @@ function FinancingPage() {
                   </div>
                 ) : (
                   <div className="space-y-1 max-h-56 overflow-y-auto">
-                    {cart.map((c) => (
-                      <PickRow
-                        key={c.productId + c.supplierId}
-                        title={`${c.productName} — ${c.supplierName}`}
-                        sub={`الكمية ${c.quantity}${c.unit ? ` ${c.unit}` : ""}`}
-                        price={c.price}
-                        onAdd={() =>
-                          addItem({
-                            name: c.productName,
-                            supplier: c.supplierName,
-                            quantity: c.quantity,
-                            unit: c.unit,
-                            price: c.price ?? null,
-                          })
-                        }
-                      />
-                    ))}
+                    {cart.map((c) => {
+                      const u = unitPriceForQty(c.price, c.priceTiers, c.quantity);
+                      return (
+                        <PickRow
+                          key={c.productId + c.supplierId}
+                          title={`${c.productName} — ${c.supplierName}`}
+                          sub={`الكمية ${c.quantity}${c.unit ? ` ${c.unit}` : ""}`}
+                          price={u}
+                          onAdd={() =>
+                            addItem({
+                              name: c.productName,
+                              supplier: c.supplierName,
+                              quantity: c.quantity,
+                              unit: c.unit,
+                              price: u,
+                            })
+                          }
+                        />
+                      );
+                    })}
                   </div>
                 ))}
 

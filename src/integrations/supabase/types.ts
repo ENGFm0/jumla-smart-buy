@@ -365,6 +365,7 @@ export type Database = {
           id: string;
           moq: number;
           price: number;
+          price_tiers: Json | null;
           product_id: string;
           stock: number | null;
           supplier_id: string;
@@ -374,6 +375,7 @@ export type Database = {
           id?: string;
           moq?: number;
           price: number;
+          price_tiers?: Json | null;
           product_id: string;
           stock?: number | null;
           supplier_id: string;
@@ -383,6 +385,7 @@ export type Database = {
           id?: string;
           moq?: number;
           price?: number;
+          price_tiers?: Json | null;
           product_id?: string;
           stock?: number | null;
           supplier_id?: string;

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { BadgeCheck, Trophy, MapPin, Lock, ShoppingCart, Check } from "lucide-react";
-import { formatSAR, type OfferWithSupplier } from "@/types";
+import { formatSAR, parseTiers, type OfferWithSupplier } from "@/types";
 import { useAuth } from "@/lib/auth";
 import { addToCart } from "@/lib/cart";
 import { Rating } from "./Rating";
@@ -26,6 +26,7 @@ export function OfferRow({
   const { user } = useAuth();
   const [added, setAdded] = useState(false);
   const s = offer.supplier;
+  const tiers = parseTiers(offer.price_tiers);
   const diff = offer.price - minPrice;
   const diffPct = minPrice > 0 ? Math.round((diff / minPrice) * 100) : 0;
 
@@ -37,6 +38,7 @@ export function OfferRow({
       supplierName: s.name,
       unit: unit ?? null,
       price: Number(offer.price),
+      priceTiers: tiers.length > 0 ? tiers : null,
       quantity: offer.moq || 1,
     });
     setAdded(true);
@@ -147,6 +149,28 @@ export function OfferRow({
           )}
         </div>
       </div>
+
+      {tiers.length > 0 && (
+        <div className="mt-3 border-t border-border pt-3">
+          <div className="text-xs font-bold text-muted-foreground mb-1">أسعار حسب الكمية</div>
+          <div className="flex flex-wrap gap-2">
+            {[{ min: 1, price: Number(offer.price) }, ...tiers.filter((t) => t.min > 1)].map(
+              (t, i, arr) => {
+                const nextMin = arr[i + 1]?.min;
+                const range = nextMin ? `${t.min}–${nextMin - 1}` : `${t.min}+`;
+                return (
+                  <div key={i} className="rounded-xl border border-border px-3 py-1.5 text-center">
+                    <div className="text-[11px] text-muted-foreground">
+                      {range} {unit ?? "قطعة"}
+                    </div>
+                    <div className="font-extrabold text-primary text-sm">{formatSAR(t.price)}</div>
+                  </div>
+                );
+              },
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

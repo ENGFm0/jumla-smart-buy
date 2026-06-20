@@ -108,3 +108,24 @@ export function orderStageDone(o: QuoteRequestDetailed): Record<OrderStage, bool
 
 export const formatSAR = (n: number) =>
   new Intl.NumberFormat("ar-SA", { maximumFractionDigits: 2 }).format(n) + " ر.س";
+
+// تسعير حسب الكمية: شريحة سعرية تبدأ من كمية معيّنة
+export type PriceTier = { min: number; price: number };
+
+export function parseTiers(v: unknown): PriceTier[] {
+  if (!Array.isArray(v)) return [];
+  return (v as PriceTier[])
+    .filter((t) => t && typeof t.min === "number" && typeof t.price === "number")
+    .sort((a, b) => a.min - b.min);
+}
+
+// سعر الوحدة المطبَّق لكمية معيّنة (أعلى شريحة لا تتجاوز الكمية)
+export function unitPriceForQty(
+  basePrice: number,
+  tiers: PriceTier[] | null | undefined,
+  qty: number,
+): number {
+  let p = basePrice;
+  for (const t of tiers ?? []) if (qty >= t.min) p = t.price;
+  return p;
+}

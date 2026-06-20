@@ -1,18 +1,28 @@
 import { useState } from "react";
-import { Pencil, Trash2, Check, X, AlertTriangle } from "lucide-react";
+import { Pencil, Trash2, Check, X, AlertTriangle, Layers } from "lucide-react";
 import { editOffer, deleteOffer } from "@/lib/products";
-import { formatSAR, type Product } from "@/types";
+import { PriceTiersEditor, cleanTiers } from "@/components/PriceTiersEditor";
+import { formatSAR, parseTiers, type PriceTier, type Product } from "@/types";
 
-type Row = { id: string; price: number; moq: number; stock: number | null; product: Product };
+type Row = {
+  id: string;
+  price: number;
+  moq: number;
+  stock: number | null;
+  price_tiers: unknown;
+  product: Product;
+};
 
 export function SupplierProductRow({ row, onChange }: { row: Row; onChange: () => void }) {
   const [editing, setEditing] = useState(false);
   const [price, setPrice] = useState(String(row.price));
   const [moq, setMoq] = useState(String(row.moq));
   const [stock, setStock] = useState(row.stock != null ? String(row.stock) : "");
+  const [tiers, setTiers] = useState<PriceTier[]>(parseTiers(row.price_tiers));
   const [busy, setBusy] = useState(false);
 
   const low = row.stock != null && row.stock < 10;
+  const tierCount = parseTiers(row.price_tiers).length;
 
   async function save() {
     setBusy(true);
@@ -22,6 +32,7 @@ export function SupplierProductRow({ row, onChange }: { row: Row; onChange: () =
         Number(price) || 0,
         Number(moq) || 1,
         stock.trim() === "" ? null : Math.max(0, Number(stock) || 0),
+        cleanTiers(tiers).length ? cleanTiers(tiers) : null,
       );
       setEditing(false);
       onChange();
@@ -48,40 +59,48 @@ export function SupplierProductRow({ row, onChange }: { row: Row; onChange: () =
       <div className="min-w-0 flex-1">
         <div className="font-bold truncate">{row.product.name}</div>
         {editing ? (
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-24 rounded-xl border border-border bg-background px-2 py-1 text-sm"
-              placeholder="السعر"
-              title="شامل الضريبة"
-            />
-            <input
-              type="number"
-              min="1"
-              value={moq}
-              onChange={(e) => setMoq(e.target.value)}
-              className="w-20 rounded-xl border border-border bg-background px-2 py-1 text-sm"
-              placeholder="الحد الأدنى"
-            />
-            <input
-              type="number"
-              min="0"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              className="w-24 rounded-xl border border-border bg-background px-2 py-1 text-sm"
-              placeholder="المخزون"
-              title="اتركه فارغاً لعدم تتبّع المخزون"
-            />
+          <div className="mt-2 space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="w-24 rounded-xl border border-border bg-background px-2 py-1 text-sm"
+                placeholder="السعر"
+                title="شامل الضريبة"
+              />
+              <input
+                type="number"
+                min="1"
+                value={moq}
+                onChange={(e) => setMoq(e.target.value)}
+                className="w-20 rounded-xl border border-border bg-background px-2 py-1 text-sm"
+                placeholder="الحد الأدنى"
+              />
+              <input
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-24 rounded-xl border border-border bg-background px-2 py-1 text-sm"
+                placeholder="المخزون"
+                title="اتركه فارغاً لعدم تتبّع المخزون"
+              />
+            </div>
+            <PriceTiersEditor tiers={tiers} onChange={setTiers} unit={row.product.unit} />
           </div>
         ) : (
           <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
             <span>
               {row.product.unit} • الحد الأدنى: {row.moq}
             </span>
+            {tierCount > 0 && (
+              <span className="inline-flex items-center gap-1 font-bold text-primary">
+                <Layers className="h-3 w-3" /> {tierCount} عرض كمية
+              </span>
+            )}
             {row.stock != null && (
               <span
                 className={`inline-flex items-center gap-1 font-bold ${low ? "text-amber-700" : "text-emerald-700"}`}

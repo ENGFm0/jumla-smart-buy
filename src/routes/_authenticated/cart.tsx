@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useCart, setQty, removeFromCart, clearSupplier, type CartItem } from "@/lib/cart";
 import { createDirectOrders } from "@/lib/quotes";
-import { formatSAR } from "@/types";
+import { formatSAR, unitPriceForQty } from "@/types";
 
 export const Route = createFileRoute("/_authenticated/cart")({
   head: () => ({ meta: [{ title: "السلة — مدد" }] }),
@@ -30,7 +30,11 @@ function CartPage() {
       g.items.push(it);
     }
     const arr = Array.from(map.values());
-    for (const g of arr) g.subtotal = g.items.reduce((s, it) => s + it.price * it.quantity, 0);
+    for (const g of arr)
+      g.subtotal = g.items.reduce(
+        (s, it) => s + unitPriceForQty(it.price, it.priceTiers, it.quantity) * it.quantity,
+        0,
+      );
     return arr;
   }, [items]);
 
@@ -42,7 +46,7 @@ function CartPage() {
           productId: it.productId,
           supplierId: it.supplierId,
           quantity: it.quantity,
-          price: it.price,
+          price: unitPriceForQty(it.price, it.priceTiers, it.quantity),
         })),
       );
       clearSupplier(g.supplierId);
@@ -107,13 +111,21 @@ function CartPage() {
                       >
                         <div className="min-w-0 flex-1">
                           <div className="font-bold truncate">{it.productName}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {formatSAR(it.price)}
-                            {it.unit ? ` / ${it.unit}` : ""} ·{" "}
-                            <span className="font-bold text-foreground">
-                              {formatSAR(it.price * it.quantity)}
-                            </span>
-                          </div>
+                          {(() => {
+                            const u = unitPriceForQty(it.price, it.priceTiers, it.quantity);
+                            return (
+                              <div className="text-xs text-muted-foreground">
+                                {formatSAR(u)}
+                                {it.unit ? ` / ${it.unit}` : ""} ·{" "}
+                                <span className="font-bold text-foreground">
+                                  {formatSAR(u * it.quantity)}
+                                </span>
+                                {it.priceTiers && it.priceTiers.length > 0 && (
+                                  <span className="text-primary"> · سعر حسب الكمية</span>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </div>
                         <div className="flex items-center gap-1">
                           <button

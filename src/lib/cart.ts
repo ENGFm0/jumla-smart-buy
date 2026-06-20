@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import type { PriceTier } from "@/types";
 
 // سلة محلية (localStorage) للشراء المباشر بالسعر المعروض.
 // عند الإتمام تُنشأ طلبات شراء مسعّرة ومقبولة جاهزة للدفع (وليست عروض أسعار).
@@ -8,7 +9,8 @@ export type CartItem = {
   supplierId: string;
   supplierName: string;
   unit: string | null;
-  price: number; // سعر الوحدة المعروض
+  price: number; // سعر القطعة (أقل كمية)
+  priceTiers: PriceTier[] | null; // عروض الكمية
   quantity: number;
 };
 
