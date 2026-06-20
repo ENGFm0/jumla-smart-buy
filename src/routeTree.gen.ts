@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SupplierIdRouteImport } from './routes/supplier.$id'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as AuthenticatedRequestProductRouteImport } from './routes/_authenticated/request-product'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMyRequestsRouteImport } from './routes/_authenticated/my-requests'
@@ -65,6 +66,11 @@ const SupplierIdRoute = SupplierIdRouteImport.update({
 const ProductIdRoute = ProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayReturnRoute = PayReturnRouteImport.update({
+  id: '/pay/return',
+  path: '/pay/return',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRequestProductRoute =
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/request-product': typeof AuthenticatedRequestProductRoute
+  '/pay/return': typeof PayReturnRoute
   '/product/$id': typeof ProductIdRoute
   '/supplier/$id': typeof SupplierIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/request-product': typeof AuthenticatedRequestProductRoute
+  '/pay/return': typeof PayReturnRoute
   '/product/$id': typeof ProductIdRoute
   '/supplier/$id': typeof SupplierIdRoute
   '/chat/$id': typeof AuthenticatedChatIdRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/_authenticated/my-requests': typeof AuthenticatedMyRequestsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/request-product': typeof AuthenticatedRequestProductRoute
+  '/pay/return': typeof PayReturnRoute
   '/product/$id': typeof ProductIdRoute
   '/supplier/$id': typeof SupplierIdRoute
   '/_authenticated/chat/$id': typeof AuthenticatedChatIdRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/my-requests'
     | '/onboarding'
     | '/request-product'
+    | '/pay/return'
     | '/product/$id'
     | '/supplier/$id'
     | '/chat/$id'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/my-requests'
     | '/onboarding'
     | '/request-product'
+    | '/pay/return'
     | '/product/$id'
     | '/supplier/$id'
     | '/chat/$id'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-requests'
     | '/_authenticated/onboarding'
     | '/_authenticated/request-product'
+    | '/pay/return'
     | '/product/$id'
     | '/supplier/$id'
     | '/_authenticated/chat/$id'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SearchRoute: typeof SearchRoute
   TermsRoute: typeof TermsRoute
+  PayReturnRoute: typeof PayReturnRoute
   ProductIdRoute: typeof ProductIdRoute
   SupplierIdRoute: typeof SupplierIdRoute
 }
@@ -306,6 +319,13 @@ declare module '@tanstack/react-router' {
       path: '/product/$id'
       fullPath: '/product/$id'
       preLoaderRoute: typeof ProductIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay/return': {
+      id: '/pay/return'
+      path: '/pay/return'
+      fullPath: '/pay/return'
+      preLoaderRoute: typeof PayReturnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/request-product': {
@@ -417,6 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SearchRoute: SearchRoute,
   TermsRoute: TermsRoute,
+  PayReturnRoute: PayReturnRoute,
   ProductIdRoute: ProductIdRoute,
   SupplierIdRoute: SupplierIdRoute,
 }

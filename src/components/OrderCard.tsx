@@ -15,6 +15,7 @@ import {
   FileText,
 } from "lucide-react";
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
+import { createTapCharge } from "@/lib/api/tap.functions";
 import {
   acceptOffer,
   markShipped,
@@ -529,71 +530,100 @@ function PaymentTransfer({
     }
   }
 
-  // المورّد لم يضف آيبانه بعد — لا يمكن التحويل
-  if (!iban) {
-    return (
-      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800">
-        لم يضف المورّد بيانات حسابه البنكي بعد. تواصل معه عبر المحادثة للاتفاق على طريقة الدفع.
-      </div>
-    );
+  async function payOnline() {
+    setBusy(true);
+    setError(null);
+    try {
+      const { url } = await createTapCharge({
+        data: { orderId: order.id, origin: window.location.origin },
+      });
+      window.location.href = url;
+    } catch (e: any) {
+      setError(e.message ?? "تعذّر بدء عملية الدفع");
+      setBusy(false);
+    }
   }
 
   return (
-    <div className="rounded-2xl border border-border p-4 space-y-3">
-      <div className="text-sm font-bold flex items-center gap-2">
-        <Landmark className="h-4 w-4 text-primary" /> الدفع عبر التحويل البنكي
-      </div>
-      <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
+    <div className="space-y-3">
+      {/* الدفع الإلكتروني عبر بوّابة Tap (مدى / Apple Pay / بطاقات) */}
+      <div className="rounded-2xl border border-border p-4 space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-muted-foreground">المبلغ المطلوب تحويله</span>
+          <span className="text-sm font-bold inline-flex items-center gap-2">
+            <CreditCard className="h-4 w-4 text-primary" /> الدفع الإلكتروني
+          </span>
           <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
         </div>
-        {order.supplier?.account_holder && (
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">اسم صاحب الحساب</span>
-            <span className="font-bold">{order.supplier.account_holder}</span>
-          </div>
-        )}
-        {order.supplier?.bank_name && (
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-muted-foreground">البنك</span>
-            <span className="font-bold">{order.supplier.bank_name}</span>
-          </div>
-        )}
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-muted-foreground">الآيبان</span>
-          <button
-            type="button"
-            onClick={copyIban}
-            className="inline-flex items-center gap-1 font-bold tabular-nums text-primary"
-            title="نسخ الآيبان"
-          >
-            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            <span dir="ltr">{iban}</span>
-          </button>
-        </div>
+        <button
+          onClick={payOnline}
+          disabled={busy}
+          className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
+        >
+          <CreditCard className="h-4 w-4" />
+          {busy ? "جارٍ التحويل لصفحة الدفع…" : "ادفع بمدى / Apple Pay / بطاقة"}
+        </button>
+        <p className="text-[11px] text-muted-foreground">دفع آمن عبر بوّابة Tap.</p>
       </div>
-      <p className="text-[11px] text-muted-foreground">
-        حوّل المبلغ إلى الآيبان أعلاه ثم ارفع صورة الإيصال. يؤكّد المورّد استلام المبلغ ويشحن طلبك.
-      </p>
-      <label className="flex items-center gap-2 rounded-xl border border-dashed border-border px-3 py-2.5 text-sm cursor-pointer hover:bg-secondary/40">
-        <Upload className="h-4 w-4 text-muted-foreground" />
-        <span className="truncate">{file ? file.name : "اختر صورة/ملف إيصال التحويل"}</span>
-        <input
-          type="file"
-          accept="image/*,application/pdf"
-          className="hidden"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        />
-      </label>
+
+      {/* بديل: تحويل بنكي مباشر لآيبان المورّد + رفع الإيصال */}
+      {iban && (
+        <details className="rounded-2xl border border-border p-4">
+          <summary className="text-sm font-bold cursor-pointer inline-flex items-center gap-2">
+            <Landmark className="h-4 w-4 text-primary" /> أو حوّل بنكياً وارفع الإيصال
+          </summary>
+          <div className="mt-3 space-y-3">
+            <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
+              {order.supplier?.account_holder && (
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground">اسم صاحب الحساب</span>
+                  <span className="font-bold">{order.supplier.account_holder}</span>
+                </div>
+              )}
+              {order.supplier?.bank_name && (
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-muted-foreground">البنك</span>
+                  <span className="font-bold">{order.supplier.bank_name}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-muted-foreground">الآيبان</span>
+                <button
+                  type="button"
+                  onClick={copyIban}
+                  className="inline-flex items-center gap-1 font-bold tabular-nums text-primary"
+                  title="نسخ الآيبان"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  <span dir="ltr">{iban}</span>
+                </button>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              حوّل المبلغ ({formatSAR(total)}) للآيبان أعلاه ثم ارفع صورة الإيصال؛ يؤكّد المورّد
+              الاستلام ويشحن.
+            </p>
+            <label className="flex items-center gap-2 rounded-xl border border-dashed border-border px-3 py-2.5 text-sm cursor-pointer hover:bg-secondary/40">
+              <Upload className="h-4 w-4 text-muted-foreground" />
+              <span className="truncate">{file ? file.name : "اختر صورة/ملف إيصال التحويل"}</span>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                className="hidden"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
+            </label>
+            <button
+              onClick={submit}
+              disabled={busy || !file}
+              className="w-full rounded-2xl border border-primary text-primary py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
+            >
+              <Landmark className="h-4 w-4" /> {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
+            </button>
+          </div>
+        </details>
+      )}
+
       {error && <p className="text-sm text-rose-700">{error}</p>}
-      <button
-        onClick={submit}
-        disabled={busy || !file}
-        className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
-      >
-        <CreditCard className="h-4 w-4" /> {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
-      </button>
     </div>
   );
 }
