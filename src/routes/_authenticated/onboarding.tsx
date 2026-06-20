@@ -113,6 +113,9 @@ function SupplierForm({ userId, onDone }: { userId: string; onDone: () => void }
   const [mapsUrl, setMapsUrl] = useState("");
   const [phone, setPhone] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [iban, setIban] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountHolder, setAccountHolder] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,7 +125,19 @@ function SupplierForm({ userId, onDone }: { userId: string; onDone: () => void }
     setError(null);
     try {
       await setPrimaryRole("supplier");
-      await upsertSupplier({ userId, name, city, phone, whatsapp, description, address, mapsUrl });
+      await upsertSupplier({
+        userId,
+        name,
+        city,
+        phone,
+        whatsapp,
+        description,
+        address,
+        mapsUrl,
+        iban,
+        bankName,
+        accountHolder,
+      });
       onDone();
     } catch (err: any) {
       setError(err.message ?? "تعذّر الحفظ");
@@ -149,6 +164,23 @@ function SupplierForm({ userId, onDone }: { userId: string; onDone: () => void }
         <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} placeholder="رابط الموقع في خرائط قوقل" className={`md:col-span-2 ${input}`} />
         <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="رقم الجوال" className={input} />
         <input required value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="رقم واتساب (بدون +)" className={input} />
+        <div className="md:col-span-2 mt-2 rounded-2xl border border-border bg-secondary/30 p-3">
+          <p className="text-sm font-bold">بيانات الحساب البنكي (لاستلام مدفوعات الطلبات)</p>
+          <p className="text-[11px] text-muted-foreground mb-3">
+            يحوّل المشتري المبلغ مباشرةً إلى آيبانك ويرفق إيصال التحويل، ثم تؤكّد الاستلام وتشحن. لا
+            نخصم أي عمولة.
+          </p>
+          <div className="grid md:grid-cols-2 gap-3">
+            <input
+              value={iban}
+              onChange={(e) => setIban(e.target.value)}
+              placeholder="رقم الآيبان (SA...)"
+              className={`md:col-span-2 ${input}`}
+            />
+            <input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="اسم البنك" className={input} />
+            <input value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} placeholder="اسم صاحب الحساب" className={input} />
+          </div>
+        </div>
         {error && <div className="md:col-span-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</div>}
         <button disabled={saving} className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60">
           {saving ? "..." : "حفظ ومتابعة"}

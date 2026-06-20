@@ -77,7 +77,7 @@ export async function getMyQuoteRequests(): Promise<QuoteRequestDetailed[]> {
   const { data, error } = await supabase
     .from("quote_requests")
     .select(
-      "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp)",
+      "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp, iban, bank_name, account_holder)",
     )
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -91,7 +91,7 @@ export async function getSupplierQuoteRequests(
   const { data, error } = await supabase
     .from("quote_requests")
     .select(
-      "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp)",
+      "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp, iban, bank_name, account_holder)",
     )
     .eq("supplier_id", supplierId)
     .order("created_at", { ascending: false });

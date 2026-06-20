@@ -35,6 +35,9 @@ export type OrderLifecycle = {
   quoted_at: string | null;
   accepted_at: string | null;
   paid_at: string | null;
+  payment_method: string | null;
+  payment_receipt_path: string | null;
+  payment_confirmed_at: string | null;
   shipped_at: string | null;
   delivered_at: string | null;
   cancelled_at: string | null;
@@ -51,7 +54,10 @@ export type OrderLifecycle = {
 export type QuoteRequestDetailed = QuoteRequest &
   OrderLifecycle & {
     product: Pick<Product, "id" | "name" | "icon" | "unit"> | null;
-    supplier: Pick<Supplier, "id" | "name" | "city" | "phone" | "whatsapp"> | null;
+    supplier: Pick<
+      Supplier,
+      "id" | "name" | "city" | "phone" | "whatsapp" | "iban" | "bank_name" | "account_holder"
+    > | null;
   };
 
 // رسالة في محادثة الطلب (مع مرفق اختياري: صوت/صورة/ملف)

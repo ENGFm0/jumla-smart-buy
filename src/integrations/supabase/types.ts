@@ -216,6 +216,9 @@ export type Database = {
           invoice_number: string | null;
           note: string | null;
           paid_at: string | null;
+          payment_confirmed_at: string | null;
+          payment_method: string | null;
+          payment_receipt_path: string | null;
           product_id: string | null;
           quantity: number;
           quoted_at: string | null;
@@ -243,6 +246,9 @@ export type Database = {
           invoice_number?: string | null;
           note?: string | null;
           paid_at?: string | null;
+          payment_confirmed_at?: string | null;
+          payment_method?: string | null;
+          payment_receipt_path?: string | null;
           product_id?: string | null;
           quantity?: number;
           quoted_at?: string | null;
@@ -270,6 +276,9 @@ export type Database = {
           invoice_number?: string | null;
           note?: string | null;
           paid_at?: string | null;
+          payment_confirmed_at?: string | null;
+          payment_method?: string | null;
+          payment_receipt_path?: string | null;
           product_id?: string | null;
           quantity?: number;
           quoted_at?: string | null;
@@ -471,10 +480,13 @@ export type Database = {
       };
       suppliers: {
         Row: {
+          account_holder: string | null;
           address: string | null;
+          bank_name: string | null;
           city: string;
           created_at: string;
           description: string | null;
+          iban: string | null;
           id: string;
           joined_year: number;
           logo: string | null;
@@ -488,10 +500,13 @@ export type Database = {
           whatsapp: string;
         };
         Insert: {
+          account_holder?: string | null;
           address?: string | null;
+          bank_name?: string | null;
           city: string;
           created_at?: string;
           description?: string | null;
+          iban?: string | null;
           id?: string;
           joined_year?: number;
           logo?: string | null;
@@ -505,10 +520,13 @@ export type Database = {
           whatsapp: string;
         };
         Update: {
+          account_holder?: string | null;
           address?: string | null;
+          bank_name?: string | null;
           city?: string;
           created_at?: string;
           description?: string | null;
+          iban?: string | null;
           id?: string;
           joined_year?: number;
           logo?: string | null;

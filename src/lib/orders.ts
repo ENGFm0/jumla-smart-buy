@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { QuoteMessage, QuoteRequestDetailed } from "@/types";
 
 const ORDER_SELECT =
-  "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp)";
+  "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp, iban, bank_name, account_holder)";
 
 // طلب واحد بكامل تفاصيله (للمشتري أو المورّد — RLS يقصره على الطرفين)
 export async function getOrderById(id: string): Promise<QuoteRequestDetailed | null> {
@@ -33,6 +33,56 @@ export async function markPaid(id: string) {
   const { error } = await supabase
     .from("quote_requests")
     .update({ paid_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------
+// الدفع عبر التحويل البنكي (آيبان المورّد + رفع إيصال التحويل)
+// ---------------------------------------------------------------------
+
+// رفع إيصال التحويل إلى المخزن الخاص (المسار يبدأ بمعرّف الطلب)
+export async function uploadPaymentReceipt(
+  quoteId: string,
+  file: Blob,
+  name: string,
+): Promise<string> {
+  const safe = name.replace(/[^\w.\-]+/g, "_").slice(-60);
+  const path = `${quoteId}/${crypto.randomUUID()}-${safe}`;
+  const { error } = await supabase.storage
+    .from("payment-receipts")
+    .upload(path, file, { contentType: (file as File).type || "application/octet-stream" });
+  if (error) throw error;
+  return path;
+}
+
+// رابط موقّت موقّع لعرض الإيصال
+export async function getPaymentReceiptUrl(path: string): Promise<string | null> {
+  const { data, error } = await supabase.storage
+    .from("payment-receipts")
+    .createSignedUrl(path, 3600);
+  if (error) return null;
+  return data.signedUrl;
+}
+
+// المشتري يؤكّد التحويل البنكي مع إرفاق الإيصال (يولّد رقم الفاتورة في القاعدة)
+export async function submitPaymentTransfer(id: string, receiptPath: string) {
+  const { error } = await supabase
+    .from("quote_requests")
+    .update({
+      paid_at: new Date().toISOString(),
+      payment_method: "bank_transfer",
+      payment_receipt_path: receiptPath,
+    })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// المورّد يؤكّد استلام المبلغ في حسابه
+export async function confirmPaymentReceived(id: string) {
+  const { error } = await supabase
+    .from("quote_requests")
+    .update({ payment_confirmed_at: new Date().toISOString() })
     .eq("id", id);
   if (error) throw error;
 }

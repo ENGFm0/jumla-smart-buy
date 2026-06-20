@@ -42,6 +42,9 @@ export async function upsertSupplier(input: {
   description?: string;
   address?: string;
   mapsUrl?: string;
+  iban?: string;
+  bankName?: string;
+  accountHolder?: string;
 }): Promise<Supplier> {
   const fields = {
     name: input.name,
@@ -51,6 +54,9 @@ export async function upsertSupplier(input: {
     description: input.description ?? null,
     address: input.address ?? null,
     maps_url: input.mapsUrl ?? null,
+    iban: input.iban?.replace(/\s+/g, "").toUpperCase() || null,
+    bank_name: input.bankName ?? null,
+    account_holder: input.accountHolder ?? null,
   };
   const existing = await getSupplierByUserId(input.userId);
   if (existing) {

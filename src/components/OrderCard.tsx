@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Star,
@@ -8,15 +8,23 @@ import {
   MessageCircle,
   Phone,
   RotateCcw,
+  Copy,
+  Check,
+  Landmark,
+  Upload,
+  FileText,
 } from "lucide-react";
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
 import {
   acceptOffer,
-  markPaid,
   markShipped,
   markDelivered,
   cancelOrder,
   rateOrder,
+  uploadPaymentReceipt,
+  submitPaymentTransfer,
+  confirmPaymentReceived,
+  getPaymentReceiptUrl,
 } from "@/lib/orders";
 import { OrderTracker } from "@/components/OrderTracker";
 import { OrderTimeline } from "@/components/OrderTimeline";
@@ -123,6 +131,13 @@ export function OrderCard({
           {order.supplier_reply && (
             <p className="text-sm text-muted-foreground mt-1">رد المورّد: {order.supplier_reply}</p>
           )}
+        </div>
+      )}
+
+      {/* حالة الدفع عبر التحويل البنكي (تظهر للطرفين بعد التحويل) */}
+      {order.paid_at && order.payment_method === "bank_transfer" && (
+        <div className="mt-4">
+          <PaymentStatus order={order} role={role} onChange={onChange} />
         </div>
       )}
 
@@ -282,15 +297,7 @@ function OrderActions({
     );
   }
   if (order.accepted_at && !order.paid_at) {
-    return (
-      <button
-        disabled={busy}
-        onClick={() => run(() => markPaid(order.id))}
-        className="rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center gap-2"
-      >
-        <CreditCard className="h-4 w-4" /> تأكيد الدفع
-      </button>
-    );
+    return <PaymentTransfer order={order} onChange={onChange} />;
   }
   if (order.shipped_at && !order.delivered_at) {
     return (
@@ -473,6 +480,189 @@ function RatingForm({
       >
         إرسال التقييم
       </button>
+    </div>
+  );
+}
+
+// المشتري: تحويل بنكي مباشر لآيبان المورّد + رفع الإيصال
+function PaymentTransfer({
+  order,
+  onChange,
+}: {
+  order: QuoteRequestDetailed;
+  onChange: () => void;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const total = Number(order.quoted_price ?? 0) * order.quantity;
+  const iban = order.supplier?.iban ?? null;
+
+  async function copyIban() {
+    if (!iban) return;
+    try {
+      await navigator.clipboard.writeText(iban);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* تجاهل */
+    }
+  }
+
+  async function submit() {
+    if (!file) {
+      setError("أرفق صورة إيصال التحويل أولاً");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const path = await uploadPaymentReceipt(order.id, file, file.name);
+      await submitPaymentTransfer(order.id, path);
+      onChange();
+    } catch (e: any) {
+      setError(e.message ?? "تعذّر إرسال الإيصال");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // المورّد لم يضف آيبانه بعد — لا يمكن التحويل
+  if (!iban) {
+    return (
+      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800">
+        لم يضف المورّد بيانات حسابه البنكي بعد. تواصل معه عبر المحادثة للاتفاق على طريقة الدفع.
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-border p-4 space-y-3">
+      <div className="text-sm font-bold flex items-center gap-2">
+        <Landmark className="h-4 w-4 text-primary" /> الدفع عبر التحويل البنكي
+      </div>
+      <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-muted-foreground">المبلغ المطلوب تحويله</span>
+          <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
+        </div>
+        {order.supplier?.account_holder && (
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted-foreground">اسم صاحب الحساب</span>
+            <span className="font-bold">{order.supplier.account_holder}</span>
+          </div>
+        )}
+        {order.supplier?.bank_name && (
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-muted-foreground">البنك</span>
+            <span className="font-bold">{order.supplier.bank_name}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-muted-foreground">الآيبان</span>
+          <button
+            type="button"
+            onClick={copyIban}
+            className="inline-flex items-center gap-1 font-bold tabular-nums text-primary"
+            title="نسخ الآيبان"
+          >
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            <span dir="ltr">{iban}</span>
+          </button>
+        </div>
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        حوّل المبلغ إلى الآيبان أعلاه ثم ارفع صورة الإيصال. يؤكّد المورّد استلام المبلغ ويشحن طلبك.
+      </p>
+      <label className="flex items-center gap-2 rounded-xl border border-dashed border-border px-3 py-2.5 text-sm cursor-pointer hover:bg-secondary/40">
+        <Upload className="h-4 w-4 text-muted-foreground" />
+        <span className="truncate">{file ? file.name : "اختر صورة/ملف إيصال التحويل"}</span>
+        <input
+          type="file"
+          accept="image/*,application/pdf"
+          className="hidden"
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+      </label>
+      {error && <p className="text-sm text-rose-700">{error}</p>}
+      <button
+        onClick={submit}
+        disabled={busy || !file}
+        className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
+      >
+        <CreditCard className="h-4 w-4" /> {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
+      </button>
+    </div>
+  );
+}
+
+// عرض حالة الدفع + الإيصال (للطرفين) + زر تأكيد الاستلام للمورّد
+function PaymentStatus({
+  order,
+  role,
+  onChange,
+}: {
+  order: QuoteRequestDetailed;
+  role: Role;
+  onChange: () => void;
+}) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const confirmed = !!order.payment_confirmed_at;
+
+  useEffect(() => {
+    let alive = true;
+    if (order.payment_receipt_path) {
+      getPaymentReceiptUrl(order.payment_receipt_path).then((u) => {
+        if (alive) setUrl(u);
+      });
+    }
+    return () => {
+      alive = false;
+    };
+  }, [order.payment_receipt_path]);
+
+  async function confirm() {
+    setBusy(true);
+    try {
+      await confirmPaymentReceived(order.id);
+      onChange();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div
+      className={`rounded-2xl border p-4 text-sm ${confirmed ? "border-emerald-200 bg-emerald-50" : "border-sky-200 bg-sky-50"}`}
+    >
+      <div
+        className={`font-bold flex items-center gap-2 ${confirmed ? "text-emerald-800" : "text-sky-800"}`}
+      >
+        <Landmark className="h-4 w-4" />
+        {confirmed ? "تم تأكيد استلام المبلغ" : "تم التحويل — بانتظار تأكيد المورّد"}
+      </div>
+      {url && (
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 mt-2 font-bold text-primary hover:underline"
+        >
+          <FileText className="h-3.5 w-3.5" /> عرض إيصال التحويل
+        </a>
+      )}
+      {role === "supplier" && !confirmed && (
+        <button
+          onClick={confirm}
+          disabled={busy}
+          className="mt-3 block w-full rounded-2xl bg-emerald-600 text-white py-2.5 font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2"
+        >
+          <CheckCircle2 className="h-4 w-4" /> {busy ? "..." : "تأكيد استلام المبلغ"}
+        </button>
+      )}
     </div>
   );
 }

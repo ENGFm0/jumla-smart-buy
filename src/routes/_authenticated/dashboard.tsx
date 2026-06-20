@@ -50,6 +50,9 @@ function DashboardPage() {
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [mapsUrl, setMapsUrl] = useState("");
+  const [iban, setIban] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountHolder, setAccountHolder] = useState("");
   useEffect(() => {
     if (supplier) {
       setName(supplier.name);
@@ -59,13 +62,28 @@ function DashboardPage() {
       setDescription(supplier.description ?? "");
       setAddress(supplier.address ?? "");
       setMapsUrl(supplier.maps_url ?? "");
+      setIban(supplier.iban ?? "");
+      setBankName(supplier.bank_name ?? "");
+      setAccountHolder(supplier.account_holder ?? "");
     }
   }, [supplier]);
 
   async function saveSupplier(e: React.FormEvent) {
     e.preventDefault();
     if (!userId) return;
-    await upsertSupplier({ userId, name, city, phone, whatsapp, description, address, mapsUrl });
+    await upsertSupplier({
+      userId,
+      name,
+      city,
+      phone,
+      whatsapp,
+      description,
+      address,
+      mapsUrl,
+      iban,
+      bankName,
+      accountHolder,
+    });
     qc.invalidateQueries({ queryKey: ["supplier", userId] });
   }
 
@@ -227,6 +245,13 @@ function DashboardPage() {
               </div>
             </div>
 
+            {!supplier.iban && (
+              <div className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                <span className="font-bold">أضف رقم الآيبان</span> من «تعديل بيانات المتجر» لتتمكّن
+                من استلام مدفوعات الطلبات عبر التحويل البنكي.
+              </div>
+            )}
+
             <details className="mt-4 rounded-3xl bg-card border border-border p-5">
               <summary className="cursor-pointer font-bold text-sm">تعديل بيانات المتجر</summary>
               <form onSubmit={saveSupplier} className="grid md:grid-cols-2 gap-3 mt-4">
@@ -277,6 +302,32 @@ function DashboardPage() {
                   placeholder="رقم واتساب (بدون +)"
                   className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
                 />
+                <div className="md:col-span-2 rounded-2xl border border-border bg-secondary/30 p-3">
+                  <p className="text-sm font-bold">بيانات الحساب البنكي (لاستلام المدفوعات)</p>
+                  <p className="text-[11px] text-muted-foreground mb-3">
+                    يحوّل المشتري المبلغ مباشرةً إلى آيبانك ويرفق الإيصال، ثم تؤكّد الاستلام وتشحن.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <input
+                      value={iban}
+                      onChange={(e) => setIban(e.target.value)}
+                      placeholder="رقم الآيبان (SA...)"
+                      className="md:col-span-2 rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                    />
+                    <input
+                      value={bankName}
+                      onChange={(e) => setBankName(e.target.value)}
+                      placeholder="اسم البنك"
+                      className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                    />
+                    <input
+                      value={accountHolder}
+                      onChange={(e) => setAccountHolder(e.target.value)}
+                      placeholder="اسم صاحب الحساب"
+                      className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
+                    />
+                  </div>
+                </div>
                 <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">
                   حفظ التعديلات
                 </button>
