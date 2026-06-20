@@ -5,6 +5,7 @@ import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { verifyTapCharge } from "@/lib/api/tap.functions";
+import { markPaid } from "@/lib/orders";
 
 const searchSchema = z.object({
   tap_id: z.string().optional(),
@@ -28,9 +29,18 @@ function PayReturnPage() {
       return;
     }
     verifyTapCharge({ data: { tapId: tap_id } })
-      .then((r) => {
+      .then(async (r) => {
         if (!alive) return;
         if (r.ok) {
+          // الدفع مؤكّد من الخادم — يثبّت المشتري الطلب «مدفوع» (RLS يقصره على طلبه)
+          if (r.orderId) {
+            try {
+              await markPaid(r.orderId);
+            } catch {
+              /* قد يكون مثبّتاً مسبقاً */
+            }
+          }
+          if (!alive) return;
           setState("ok");
           setTimeout(() => navigate({ to: "/my-requests" }), 2200);
         } else {

@@ -17,6 +17,7 @@ import {
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
 import { createTapCharge } from "@/lib/api/tap.functions";
 import { getSupplierById } from "@/lib/suppliers";
+import { supabase } from "@/integrations/supabase/client";
 import {
   acceptOffer,
   markShipped,
@@ -558,8 +559,18 @@ function PaymentTransfer({
     setBusy(true);
     setError(null);
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const { url } = await createTapCharge({
-        data: { orderId: order.id, origin: window.location.origin },
+        data: {
+          orderId: order.id,
+          amount: total,
+          origin: window.location.origin,
+          email: user?.email ?? undefined,
+          customerName: user?.email?.split("@")[0] ?? undefined,
+          description: `دفع طلب ${order.product?.name ?? "منتج"} — منصة مدد`,
+        },
       });
       window.location.href = url;
     } catch (e: any) {
