@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
 import { createTapCharge } from "@/lib/api/tap.functions";
+import { getSupplierById } from "@/lib/suppliers";
 import {
   acceptOffer,
   markShipped,
@@ -497,9 +498,32 @@ function PaymentTransfer({
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bank, setBank] = useState<{
+    iban: string | null;
+    bank_name: string | null;
+    account_holder: string | null;
+  } | null>(null);
 
   const total = Number(order.quoted_price ?? 0) * order.quantity;
-  const iban = order.supplier?.iban ?? null;
+  const iban = bank?.iban ?? null;
+
+  // بيانات الحساب البنكي للمورّد تُجلب عند الحاجة (لخيار التحويل البنكي البديل)
+  useEffect(() => {
+    let alive = true;
+    getSupplierById(order.supplier_id)
+      .then((s) => {
+        if (!alive || !s) return;
+        setBank({
+          iban: s.iban ?? null,
+          bank_name: s.bank_name ?? null,
+          account_holder: s.account_holder ?? null,
+        });
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [order.supplier_id]);
 
   async function copyIban() {
     if (!iban) return;
@@ -573,16 +597,16 @@ function PaymentTransfer({
           </summary>
           <div className="mt-3 space-y-3">
             <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
-              {order.supplier?.account_holder && (
+              {bank?.account_holder && (
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-muted-foreground">اسم صاحب الحساب</span>
-                  <span className="font-bold">{order.supplier.account_holder}</span>
+                  <span className="font-bold">{bank.account_holder}</span>
                 </div>
               )}
-              {order.supplier?.bank_name && (
+              {bank?.bank_name && (
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-muted-foreground">البنك</span>
-                  <span className="font-bold">{order.supplier.bank_name}</span>
+                  <span className="font-bold">{bank.bank_name}</span>
                 </div>
               )}
               <div className="flex items-center justify-between gap-2">

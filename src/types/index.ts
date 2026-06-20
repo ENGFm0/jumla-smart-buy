@@ -54,10 +54,7 @@ export type OrderLifecycle = {
 export type QuoteRequestDetailed = QuoteRequest &
   OrderLifecycle & {
     product: Pick<Product, "id" | "name" | "icon" | "unit"> | null;
-    supplier: Pick<
-      Supplier,
-      "id" | "name" | "city" | "phone" | "whatsapp" | "iban" | "bank_name" | "account_holder"
-    > | null;
+    supplier: Pick<Supplier, "id" | "name" | "city" | "phone" | "whatsapp"> | null;
   };
 
 // رسالة في محادثة الطلب (مع مرفق اختياري: صوت/صورة/ملف)

@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { QuoteMessage, QuoteRequestDetailed } from "@/types";
 
 const ORDER_SELECT =
-  "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp, iban, bank_name, account_holder)";
+  "*, product:products(id, name, icon, unit), supplier:suppliers(id, name, city, phone, whatsapp)";
 
 // طلب واحد بكامل تفاصيله (للمشتري أو المورّد — RLS يقصره على الطرفين)
 export async function getOrderById(id: string): Promise<QuoteRequestDetailed | null> {

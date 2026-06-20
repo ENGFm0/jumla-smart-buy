@@ -26,15 +26,12 @@ type OrderRow = {
   paid_at: string | null;
   accepted_at: string | null;
   product_id: string | null;
-  custom_product: string | null;
 };
 
 async function loadOrder(orderId: string): Promise<OrderRow | null> {
   const { data } = await supabaseAdmin
     .from("quote_requests")
-    .select(
-      "id, buyer_id, quoted_price, quantity, paid_at, accepted_at, product_id, custom_product",
-    )
+    .select("id, buyer_id, quoted_price, quantity, paid_at, accepted_at, product_id")
     .eq("id", orderId)
     .maybeSingle();
   return (data as OrderRow) ?? null;
@@ -71,7 +68,7 @@ export const createTapCharge = createServerFn({ method: "POST" })
     const { data: userRes } = await supabaseAdmin.auth.admin.getUserById(order.buyer_id);
     if (userRes?.user?.email) email = userRes.user.email;
 
-    let productName = order.custom_product ?? "طلب";
+    let productName = "طلب";
     if (order.product_id) {
       const { data: p } = await supabaseAdmin
         .from("products")
@@ -143,8 +140,6 @@ export const verifyTapCharge = createServerFn({ method: "POST" })
           .from("quote_requests")
           .update({
             paid_at: new Date().toISOString(),
-            payment_method: "tap",
-            payment_confirmed_at: new Date().toISOString(),
             invoice_number: invoice,
           })
           .eq("id", orderId)
