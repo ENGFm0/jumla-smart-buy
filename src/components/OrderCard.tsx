@@ -581,32 +581,16 @@ function PaymentTransfer({
 
   return (
     <div className="space-y-3">
-      {/* الدفع الإلكتروني عبر بوّابة Tap (مدى / Apple Pay / بطاقات) */}
-      <div className="rounded-2xl border border-border p-4 space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-bold inline-flex items-center gap-2">
-            <CreditCard className="h-4 w-4 text-primary" /> الدفع الإلكتروني
-          </span>
-          <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
-        </div>
-        <button
-          onClick={payOnline}
-          disabled={busy}
-          className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
-        >
-          <CreditCard className="h-4 w-4" />
-          {busy ? "جارٍ التحويل لصفحة الدفع…" : "ادفع بمدى / Apple Pay / بطاقة"}
-        </button>
-        <p className="text-[11px] text-muted-foreground">دفع آمن عبر بوّابة Tap.</p>
-      </div>
-
-      {/* بديل: تحويل بنكي مباشر لآيبان المورّد + رفع الإيصال */}
-      {iban && (
-        <details className="rounded-2xl border border-border p-4">
-          <summary className="text-sm font-bold cursor-pointer inline-flex items-center gap-2">
-            <Landmark className="h-4 w-4 text-primary" /> أو حوّل بنكياً وارفع الإيصال
-          </summary>
-          <div className="mt-3 space-y-3">
+      {iban ? (
+        <>
+          {/* الطريقة الأساسية: تحويل بنكي مباشر لآيبان المورّد (الفلوس تروح للمورّد) */}
+          <div className="rounded-2xl border border-border p-4 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-bold inline-flex items-center gap-2">
+                <Landmark className="h-4 w-4 text-primary" /> تحويل بنكي مباشر للمورّد
+              </span>
+              <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
+            </div>
             <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
               {bank?.account_holder && (
                 <div className="flex items-center justify-between gap-2">
@@ -650,12 +634,51 @@ function PaymentTransfer({
             <button
               onClick={submit}
               disabled={busy || !file}
-              className="w-full rounded-2xl border border-primary text-primary py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
+              className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
             >
-              <Landmark className="h-4 w-4" /> {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
+              <Landmark className="h-4 w-4" />{" "}
+              {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
             </button>
           </div>
-        </details>
+
+          {/* خيار ثانوي: بطاقة عبر تاب (الفلوس تمرّ عبر حساب المنصّة) */}
+          <details className="rounded-2xl border border-border p-4">
+            <summary className="text-sm font-bold cursor-pointer inline-flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-primary" /> أو ادفع بالبطاقة (مدى / Apple Pay)
+            </summary>
+            <div className="mt-3 space-y-2">
+              <button
+                onClick={payOnline}
+                disabled={busy}
+                className="w-full rounded-2xl border border-primary text-primary py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                {busy ? "جارٍ التحويل لصفحة الدفع…" : "ادفع بمدى / Apple Pay / بطاقة"}
+              </button>
+            </div>
+          </details>
+        </>
+      ) : (
+        /* المورّد لم يضف آيبانه بعد → الدفع بالبطاقة عبر تاب */
+        <div className="rounded-2xl border border-border p-4 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-sm font-bold inline-flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-primary" /> الدفع الإلكتروني
+            </span>
+            <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
+          </div>
+          <button
+            onClick={payOnline}
+            disabled={busy}
+            className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
+          >
+            <CreditCard className="h-4 w-4" />
+            {busy ? "جارٍ التحويل لصفحة الدفع…" : "ادفع بمدى / Apple Pay / بطاقة"}
+          </button>
+          <p className="text-[11px] text-muted-foreground">
+            لم يضف المورّد آيبانه بعد للتحويل المباشر.
+          </p>
+        </div>
       )}
 
       {error && <p className="text-sm text-rose-700">{error}</p>}
