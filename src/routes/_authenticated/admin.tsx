@@ -135,6 +135,23 @@ function AdminPage() {
                   <div className="text-xs text-muted-foreground">
                     {s.city} • {s.phone}
                   </div>
+                  {s.iban ? (
+                    <div className="mt-1 rounded-lg bg-secondary/40 px-2 py-1 text-[11px]">
+                      <span className="text-muted-foreground">الحساب:</span>{" "}
+                      <span className="font-bold">{s.account_holder || "—"}</span>
+                      {s.bank_name ? ` • ${s.bank_name}` : ""} •{" "}
+                      <span className="font-mono" dir="ltr">
+                        {s.iban}
+                      </span>
+                      <div className="text-amber-700 mt-0.5">
+                        تأكّد أن اسم صاحب الحساب يطابق المورّد قبل التوثيق.
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      لم يضف آيباناً بعد.
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={async () => {

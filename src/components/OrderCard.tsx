@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import {
   Star,
   Truck,
-  CreditCard,
   CheckCircle2,
   MessageCircle,
   Phone,
@@ -13,11 +12,10 @@ import {
   Landmark,
   Upload,
   FileText,
+  ShieldCheck,
 } from "lucide-react";
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
-import { createTapCharge } from "@/lib/api/tap.functions";
 import { getSupplierById } from "@/lib/suppliers";
-import { supabase } from "@/integrations/supabase/client";
 import {
   acceptOffer,
   markShipped,
@@ -503,10 +501,12 @@ function PaymentTransfer({
     iban: string | null;
     bank_name: string | null;
     account_holder: string | null;
+    verified: boolean;
   } | null>(null);
 
   const total = Number(order.quoted_price ?? 0) * order.quantity;
   const iban = bank?.iban ?? null;
+  const verified = bank?.verified ?? false;
 
   // بيانات الحساب البنكي للمورّد تُجلب عند الحاجة (لخيار التحويل البنكي البديل)
   useEffect(() => {
@@ -518,6 +518,7 @@ function PaymentTransfer({
           iban: s.iban ?? null,
           bank_name: s.bank_name ?? null,
           account_holder: s.account_holder ?? null,
+          verified: !!s.verified,
         });
       })
       .catch(() => {});
@@ -555,129 +556,76 @@ function PaymentTransfer({
     }
   }
 
-  async function payOnline() {
-    setBusy(true);
-    setError(null);
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      const { url } = await createTapCharge({
-        data: {
-          orderId: order.id,
-          amount: total,
-          origin: window.location.origin,
-          email: user?.email ?? undefined,
-          customerName: user?.email?.split("@")[0] ?? undefined,
-          description: `دفع طلب ${order.product?.name ?? "منتج"} — منصة مدد`,
-        },
-      });
-      window.location.href = url;
-    } catch (e: any) {
-      setError(e.message ?? "تعذّر بدء عملية الدفع");
-      setBusy(false);
-    }
-  }
+  // يظهر الآيبان للعميل فقط إذا اعتمد الأدمن المورّد (حماية من حساب مزوّر)
+  const canTransfer = !!iban && verified;
 
   return (
     <div className="space-y-3">
-      {iban ? (
-        <>
-          {/* الطريقة الأساسية: تحويل بنكي مباشر لآيبان المورّد (الفلوس تروح للمورّد) */}
-          <div className="rounded-2xl border border-border p-4 space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-bold inline-flex items-center gap-2">
-                <Landmark className="h-4 w-4 text-primary" /> تحويل بنكي مباشر للمورّد
-              </span>
-              <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
-            </div>
-            <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
-              {bank?.account_holder && (
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-muted-foreground">اسم صاحب الحساب</span>
-                  <span className="font-bold">{bank.account_holder}</span>
-                </div>
-              )}
-              {bank?.bank_name && (
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-muted-foreground">البنك</span>
-                  <span className="font-bold">{bank.bank_name}</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-muted-foreground">الآيبان</span>
-                <button
-                  type="button"
-                  onClick={copyIban}
-                  className="inline-flex items-center gap-1 font-bold tabular-nums text-primary"
-                  title="نسخ الآيبان"
-                >
-                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  <span dir="ltr">{iban}</span>
-                </button>
-              </div>
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              حوّل المبلغ ({formatSAR(total)}) للآيبان أعلاه ثم ارفع صورة الإيصال؛ يؤكّد المورّد
-              الاستلام ويشحن.
-            </p>
-            <label className="flex items-center gap-2 rounded-xl border border-dashed border-border px-3 py-2.5 text-sm cursor-pointer hover:bg-secondary/40">
-              <Upload className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{file ? file.name : "اختر صورة/ملف إيصال التحويل"}</span>
-              <input
-                type="file"
-                accept="image/*,application/pdf"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              />
-            </label>
-            <button
-              onClick={submit}
-              disabled={busy || !file}
-              className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
-            >
-              <Landmark className="h-4 w-4" />{" "}
-              {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
-            </button>
-          </div>
-
-          {/* خيار ثانوي: بطاقة عبر تاب (الفلوس تمرّ عبر حساب المنصّة) */}
-          <details className="rounded-2xl border border-border p-4">
-            <summary className="text-sm font-bold cursor-pointer inline-flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-primary" /> أو ادفع بالبطاقة (مدى / Apple Pay)
-            </summary>
-            <div className="mt-3 space-y-2">
-              <button
-                onClick={payOnline}
-                disabled={busy}
-                className="w-full rounded-2xl border border-primary text-primary py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
-              >
-                <CreditCard className="h-4 w-4" />
-                {busy ? "جارٍ التحويل لصفحة الدفع…" : "ادفع بمدى / Apple Pay / بطاقة"}
-              </button>
-            </div>
-          </details>
-        </>
-      ) : (
-        /* المورّد لم يضف آيبانه بعد → الدفع بالبطاقة عبر تاب */
-        <div className="rounded-2xl border border-border p-4 space-y-2">
+      {canTransfer ? (
+        <div className="rounded-2xl border border-border p-4 space-y-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-bold inline-flex items-center gap-2">
-              <CreditCard className="h-4 w-4 text-primary" /> الدفع الإلكتروني
+              <Landmark className="h-4 w-4 text-primary" /> تحويل بنكي مباشر للمورّد
             </span>
             <span className="font-extrabold text-primary tabular-nums">{formatSAR(total)}</span>
           </div>
+          <div className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
+            <ShieldCheck className="h-3 w-3" /> حساب موثّق من المنصّة
+          </div>
+          <div className="rounded-xl bg-secondary/40 p-3 text-sm space-y-1.5">
+            {bank?.account_holder && (
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-muted-foreground">اسم صاحب الحساب</span>
+                <span className="font-bold">{bank.account_holder}</span>
+              </div>
+            )}
+            {bank?.bank_name && (
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-muted-foreground">البنك</span>
+                <span className="font-bold">{bank.bank_name}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-muted-foreground">الآيبان</span>
+              <button
+                type="button"
+                onClick={copyIban}
+                className="inline-flex items-center gap-1 font-bold tabular-nums text-primary"
+                title="نسخ الآيبان"
+              >
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                <span dir="ltr">{iban}</span>
+              </button>
+            </div>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            تأكّد أن اسم صاحب الحساب يطابق اسم المورّد، ثم حوّل المبلغ ({formatSAR(total)}) وارفع صورة
+            الإيصال؛ يؤكّد المورّد الاستلام ويشحن.
+          </p>
+          <label className="flex items-center gap-2 rounded-xl border border-dashed border-border px-3 py-2.5 text-sm cursor-pointer hover:bg-secondary/40">
+            <Upload className="h-4 w-4 text-muted-foreground" />
+            <span className="truncate">{file ? file.name : "اختر صورة/ملف إيصال التحويل"}</span>
+            <input
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
           <button
-            onClick={payOnline}
-            disabled={busy}
+            onClick={submit}
+            disabled={busy || !file}
             className="w-full rounded-2xl bg-primary text-primary-foreground py-2.5 font-bold text-sm disabled:opacity-60 inline-flex items-center justify-center gap-2"
           >
-            <CreditCard className="h-4 w-4" />
-            {busy ? "جارٍ التحويل لصفحة الدفع…" : "ادفع بمدى / Apple Pay / بطاقة"}
+            <Landmark className="h-4 w-4" />{" "}
+            {busy ? "جارٍ الإرسال…" : "أكّدت التحويل وأرفقت الإيصال"}
           </button>
-          <p className="text-[11px] text-muted-foreground">
-            لم يضف المورّد آيبانه بعد للتحويل المباشر.
-          </p>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800">
+          {iban
+            ? "حساب المورّد البنكي قيد المراجعة والتوثيق من المنصّة. لا تحوّل الآن — تواصل معه عبر المحادثة."
+            : "لم يضف المورّد بيانات حسابه البنكي بعد. تواصل معه عبر المحادثة."}
         </div>
       )}
 
