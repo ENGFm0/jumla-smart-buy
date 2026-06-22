@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { PriceStat } from "@/components/PriceStat";
 import { OfferRow } from "@/components/OfferRow";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { Reveal } from "@/components/Reveal";
 import { getProductWithOffers, getCategories } from "@/lib/products";
 
 export const Route = createFileRoute("/product/$id")({
@@ -53,16 +54,16 @@ function ProductPage() {
           ← العودة للبحث
         </Link>
 
-        <div className="rounded-3xl bg-card border border-border p-6 mt-3">
+        <div className="rounded-3xl bg-card border border-border p-6 mt-3 shadow-sm">
           <div className="flex items-start gap-4">
             {data.image_url ? (
               <img
                 src={data.image_url}
                 alt={data.name}
-                className="h-20 w-20 rounded-2xl object-cover shrink-0"
+                className="h-20 w-20 rounded-2xl object-cover shrink-0 shadow-sm"
               />
             ) : (
-              <div className="rounded-2xl bg-brand-soft text-primary p-4 shrink-0">
+              <div className="rounded-2xl bg-gradient-to-br from-brand-soft to-secondary text-primary p-4 shrink-0 shadow-sm">
                 <Icon className="h-10 w-10" />
               </div>
             )}
@@ -95,15 +96,16 @@ function ProductPage() {
         <h2 className="text-xl font-extrabold mt-8 mb-3">العروض المتاحة</h2>
         <div className="space-y-3">
           {data.offers.map((o, i) => (
-            <OfferRow
-              key={o.id}
-              offer={o}
-              isBest={i === 0}
-              minPrice={Number(data.offers[0]?.price ?? 0)}
-              productId={data.id}
-              productName={data.name}
-              unit={data.unit}
-            />
+            <Reveal key={o.id} delay={Math.min(i, 8) * 50}>
+              <OfferRow
+                offer={o}
+                isBest={i === 0}
+                minPrice={Number(data.offers[0]?.price ?? 0)}
+                productId={data.id}
+                productName={data.name}
+                unit={data.unit}
+              />
+            </Reveal>
           ))}
           {data.offers.length === 0 && (
             <div className="rounded-3xl border border-dashed border-border p-10 text-center text-muted-foreground">

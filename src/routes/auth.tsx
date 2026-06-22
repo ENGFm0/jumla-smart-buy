@@ -44,8 +44,12 @@ function AuthPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12 flex-1 flex items-start justify-center">
-        <div className="w-full max-w-md rounded-3xl bg-card border border-border p-6 md:p-8 shadow-sm">
+      <main className="relative container mx-auto px-4 py-12 flex-1 flex items-start justify-center">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -top-10 right-1/4 h-64 w-64 rounded-full bg-brand-soft blur-3xl opacity-60 animate-blob" />
+          <div className="absolute top-20 left-1/4 h-56 w-56 rounded-full bg-teal-200/40 blur-3xl animate-blob [animation-delay:4s]" />
+        </div>
+        <div className="relative w-full max-w-md rounded-[28px] bg-card border border-border p-6 md:p-8 shadow-xl">
           <div className="flex bg-secondary rounded-2xl p-1 mb-6">
             <button
               onClick={() => setMode("signup")}
@@ -114,7 +118,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60"
+              className="w-full rounded-full bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60 hover:shadow-lg hover:shadow-primary/20 transition"
             >
               {loading ? "..." : mode === "signup" ? "إنشاء الحساب" : "دخول"}
             </button>

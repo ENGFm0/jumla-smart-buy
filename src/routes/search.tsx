@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { CategoryChip } from "@/components/CategoryChip";
+import { Reveal } from "@/components/Reveal";
 import { getCategories, getProductsWithStats } from "@/lib/products";
 import { getCities } from "@/lib/suppliers";
 
@@ -73,20 +74,23 @@ function SearchPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8 flex-1">
-        <div className="rounded-3xl bg-card border border-border p-4 md:p-6 shadow-sm">
-          <div className="flex items-center gap-2">
-            <SearchIcon className="h-5 w-5 text-muted-foreground mr-2 ml-1" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="اكتب اسم المنتج…"
-              className="flex-1 bg-transparent outline-none py-2 text-base"
-              autoFocus
-            />
+        <h1 className="text-2xl md:text-3xl font-extrabold mb-4">ابحث وقارن</h1>
+        <div className="sticky top-16 z-20 rounded-3xl bg-card/95 backdrop-blur border border-border p-4 md:p-5 shadow-sm">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 rounded-2xl bg-secondary/50 px-3 flex-1 min-w-48">
+              <SearchIcon className="h-5 w-5 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="اكتب اسم المنتج…"
+                className="flex-1 bg-transparent outline-none py-2.5 text-base"
+                autoFocus
+              />
+            </div>
             <select
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="rounded-2xl border border-border bg-background px-3 py-2 text-sm font-medium"
+              className="rounded-2xl border border-border bg-background px-3 py-2.5 text-sm font-medium"
               title="فلترة بالمدينة"
             >
               <option value="all">كل المدن</option>
@@ -133,7 +137,7 @@ function SearchPage() {
           </span>
           <Link
             to="/request-product"
-            className="inline-flex items-center gap-2 rounded-2xl bg-primary text-primary-foreground px-4 py-2 text-sm font-bold shrink-0"
+            className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold shrink-0 hover:scale-105 transition"
           >
             <PackageSearch className="h-4 w-4" /> اطلب منتجاً غير متوفّر
           </Link>
@@ -154,8 +158,10 @@ function SearchPage() {
             <>
               <div className="text-sm text-muted-foreground mb-3">{sorted.length} منتج</div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sorted.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                {sorted.map((p, i) => (
+                  <Reveal key={p.id} delay={Math.min(i, 8) * 50}>
+                    <ProductCard product={p} />
+                  </Reveal>
                 ))}
               </div>
             </>
