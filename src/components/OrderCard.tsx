@@ -13,7 +13,14 @@ import {
   Upload,
   FileText,
   ShieldCheck,
+  Clock,
+  Tag,
+  Wallet,
+  XCircle,
+  PackageCheck,
+  Hash,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
 import { getSupplierById } from "@/lib/suppliers";
 import {
@@ -30,19 +37,47 @@ import {
 import { OrderTracker } from "@/components/OrderTracker";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderInvoice } from "@/components/OrderInvoice";
-import {
-  formatSAR,
-  QUOTE_STATUS_LABEL,
-  type QuoteRequestDetailed,
-  type QuoteStatus,
-} from "@/types";
+import { formatSAR, type QuoteRequestDetailed, type QuoteStatus } from "@/types";
 
-const STATUS_STYLE: Record<QuoteStatus, string> = {
-  pending: "bg-amber-100 text-amber-800",
-  quoted: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-rose-100 text-rose-700",
-  closed: "bg-slate-200 text-slate-600",
-};
+// حالة الطلب الحالية → نص + ألوان + أيقونة (تقود شريط البطاقة العلوي والشارة)
+type StageMeta = { label: string; badge: string; accent: string; Icon: LucideIcon };
+function stageMeta(o: QuoteRequestDetailed): StageMeta {
+  if (o.cancelled_at)
+    return { label: "ملغي", badge: "bg-rose-100 text-rose-700", accent: "bg-rose-400", Icon: XCircle };
+  if (o.status === "rejected")
+    return { label: "مرفوض", badge: "bg-rose-100 text-rose-700", accent: "bg-rose-400", Icon: XCircle };
+  if (o.delivered_at)
+    return {
+      label: "تم التوصيل",
+      badge: "bg-emerald-100 text-emerald-700",
+      accent: "bg-emerald-500",
+      Icon: PackageCheck,
+    };
+  if (o.shipped_at)
+    return { label: "قيد الشحن", badge: "bg-sky-100 text-sky-700", accent: "bg-sky-500", Icon: Truck };
+  if (o.paid_at)
+    return {
+      label: "مدفوع — قيد التجهيز",
+      badge: "bg-indigo-100 text-indigo-700",
+      accent: "bg-indigo-500",
+      Icon: CheckCircle2,
+    };
+  if (o.accepted_at)
+    return {
+      label: "بانتظار الدفع",
+      badge: "bg-teal-100 text-teal-700",
+      accent: "bg-teal-500",
+      Icon: Wallet,
+    };
+  if (o.status === "quoted")
+    return { label: "تم التسعير", badge: "bg-amber-100 text-amber-800", accent: "bg-amber-400", Icon: Tag };
+  return {
+    label: "بانتظار التسعير",
+    badge: "bg-slate-100 text-slate-600",
+    accent: "bg-slate-300",
+    Icon: Clock,
+  };
+}
 
 type Role = "buyer" | "supplier";
 
@@ -57,22 +92,31 @@ export function OrderCard({
 }) {
   const offerExists = order.status === "quoted" || order.quoted_price != null;
   const active = order.status !== "rejected" && !order.cancelled_at;
+  const meta = stageMeta(order);
+  const StatusIcon = meta.Icon;
+  const total = order.quoted_price != null ? Number(order.quoted_price) * order.quantity : null;
 
   return (
-    <div className="rounded-3xl bg-card border border-border p-5">
+    <div className="rounded-3xl bg-card border border-border p-5 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      {/* شريط الحالة العلوي الملوّن */}
+      <div className={`-mx-5 -mt-5 mb-4 h-1.5 ${meta.accent}`} />
+
       {/* الترويسة */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h3 className="font-bold">
-            {order.product?.name ?? order.custom_product ?? "منتج"}
-            {!order.product && order.custom_product && (
-              <span className="mr-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground align-middle">
-                طلب خاص
-              </span>
-            )}
-          </h3>
-          {role === "buyer" ? (
-            <>
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-soft to-secondary flex items-center justify-center text-2xl shrink-0">
+            {order.product?.icon ?? "📦"}
+          </div>
+          <div className="min-w-0">
+            <h3 className="font-bold leading-tight flex items-center gap-2 flex-wrap">
+              {order.product?.name ?? order.custom_product ?? "منتج"}
+              {!order.product && order.custom_product && (
+                <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                  طلب خاص
+                </span>
+              )}
+            </h3>
+            {role === "buyer" && (
               <p className="text-sm text-muted-foreground mt-1">
                 المورّد:{" "}
                 {order.supplier?.id ? (
@@ -88,18 +132,29 @@ export function OrderCard({
                 )}
                 {order.supplier?.city ? ` — ${order.supplier.city}` : ""}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                الكمية: <span className="font-bold text-foreground">{order.quantity}</span>
-              </p>
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground mt-1">الكمية المطلوبة: {order.quantity}</p>
-          )}
-          {order.note && <p className="text-sm text-muted-foreground mt-1">ملاحظة: {order.note}</p>}
+            )}
+            {order.note && (
+              <p className="text-sm text-muted-foreground mt-1">ملاحظة: {order.note}</p>
+            )}
+          </div>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-bold ${STATUS_STYLE[order.status]}`}>
-          {QUOTE_STATUS_LABEL[order.status]}
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shrink-0 ${meta.badge}`}
+        >
+          <StatusIcon className="h-3.5 w-3.5" /> {meta.label}
         </span>
+      </div>
+
+      {/* شرائح: الكمية والإجمالي */}
+      <div className="mt-3 flex items-center gap-2 flex-wrap">
+        <span className="inline-flex items-center gap-1 rounded-xl bg-secondary/60 px-2.5 py-1 text-xs font-bold">
+          <Hash className="h-3.5 w-3.5 text-muted-foreground" /> الكمية: {order.quantity}
+        </span>
+        {total != null && (
+          <span className="inline-flex items-center gap-1 rounded-xl bg-brand-soft px-2.5 py-1 text-xs font-bold text-primary">
+            الإجمالي: {formatSAR(total)}
+          </span>
+        )}
       </div>
 
       {/* المتتبّع المرئي */}

@@ -136,7 +136,7 @@ function MyRequestsPage() {
                     className="flex items-center gap-3 p-4 cursor-pointer hover:bg-secondary/40 transition"
                     onClick={() => toggle(key)}
                   >
-                    <div className="h-11 w-11 rounded-2xl bg-brand-soft text-primary flex items-center justify-center font-extrabold shrink-0">
+                    <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-teal-600 text-white flex items-center justify-center font-extrabold shrink-0 shadow-sm">
                       {g.name.charAt(0)}
                     </div>
                     <div className="min-w-0 flex-1">
