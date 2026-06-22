@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { FileText } from "lucide-react";
+import { FileText, Printer } from "lucide-react";
 import { getBuyerContact } from "@/lib/orders";
+import { printInvoice } from "@/lib/printInvoice";
 import { formatSAR, type QuoteRequestDetailed } from "@/types";
 
 function fmtDate(d: string | null): string {
@@ -31,10 +32,33 @@ export function OrderInvoice({ order }: { order: QuoteRequestDetailed }) {
         <div className="flex items-center gap-2 font-extrabold">
           <FileText className="h-5 w-5 text-primary" /> فاتورة
         </div>
-        <div className="text-left">
-          <div className="text-xs text-muted-foreground">رقم الفاتورة</div>
-          <div className="font-bold text-sm">{order.invoice_number ?? "—"}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">{fmtDate(order.paid_at)}</div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() =>
+              printInvoice({
+                invoiceNumber: order.invoice_number,
+                date: order.paid_at,
+                supplier: {
+                  name: order.supplier?.name,
+                  city: order.supplier?.city,
+                  phone: order.supplier?.phone,
+                },
+                buyer: { name: buyer?.business_name, city: buyer?.city, phone: buyer?.phone },
+                productName: order.product?.name ?? order.custom_product ?? "منتج",
+                unitLabel: order.product?.unit,
+                quantity: order.quantity,
+                unitPrice: unit,
+              })
+            }
+            className="inline-flex items-center gap-1 rounded-xl border border-border px-3 py-1.5 text-xs font-bold hover:bg-secondary transition"
+          >
+            <Printer className="h-3.5 w-3.5" /> طباعة
+          </button>
+          <div className="text-left">
+            <div className="text-xs text-muted-foreground">رقم الفاتورة</div>
+            <div className="font-bold text-sm">{order.invoice_number ?? "—"}</div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">{fmtDate(order.paid_at)}</div>
+          </div>
         </div>
       </div>
 

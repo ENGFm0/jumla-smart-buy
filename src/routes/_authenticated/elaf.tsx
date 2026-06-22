@@ -28,6 +28,8 @@ import {
   ChevronDown,
   Activity,
   TrendingUp,
+  Receipt,
+  Printer,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -43,6 +45,8 @@ import {
   type AdminOrder,
 } from "@/lib/admin";
 import { getProductsBySupplier } from "@/lib/products";
+import { getBuyerContactsByIds, type BuyerContact } from "@/lib/orders";
+import { printInvoice } from "@/lib/printInvoice";
 import { classifyOrder, type OrderCategory } from "@/lib/orderFilters";
 import { formatSAR } from "@/types";
 
@@ -95,7 +99,29 @@ function AdminPage() {
     qc.invalidateQueries({ queryKey: ["admin-stats"] });
   };
 
+  // بيانات المشترين (للبحث عن الفواتير برقم الجوال)
+  const buyerIds = useMemo(() => Array.from(new Set(orders.map((o) => o.buyer_id))), [orders]);
+  const { data: buyers = {} } = useQuery({
+    queryKey: ["admin-buyer-contacts", buyerIds],
+    queryFn: () => getBuyerContactsByIds(buyerIds),
+    enabled: isAdmin && buyerIds.length > 0,
+  });
+
   const [supQ, setSupQ] = useState("");
+  const [invQ, setInvQ] = useState("");
+
+  const invResults = useMemo(() => {
+    const q = invQ.trim().toLowerCase();
+    if (!q) return [];
+    return orders
+      .filter((o) => {
+        const b = buyers[o.buyer_id];
+        const hay =
+          `${o.invoice_number ?? ""} ${o.product?.name ?? o.custom_product ?? ""} ${o.supplier?.name ?? ""} ${b?.business_name ?? ""} ${b?.phone ?? ""}`.toLowerCase();
+        return hay.includes(q);
+      })
+      .slice(0, 40);
+  }, [invQ, orders, buyers]);
 
   // تحليلات مشتقّة من الطلبات
   const analytics = useMemo(() => {
@@ -209,6 +235,58 @@ function AdminPage() {
           </div>
         )}
 
+        {/* بحث الفواتير والطلبات */}
+        <section className="rounded-3xl bg-card border border-border p-6 mb-8">
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+            <h2 className="font-bold text-lg flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-primary" /> بحث الفواتير والطلبات
+            </h2>
+            <SearchBox value={invQ} onChange={setInvQ} placeholder="رقم الفاتورة / الجوال / المنتج…" />
+          </div>
+          {invQ.trim() === "" ? (
+            <p className="text-sm text-muted-foreground">
+              اكتب رقم الفاتورة أو رقم جوال العميل أو اسم المنتج/المورّد للبحث وعرض الفاتورة وطباعتها.
+            </p>
+          ) : invResults.length === 0 ? (
+            <p className="text-sm text-muted-foreground">لا توجد نتائج مطابقة.</p>
+          ) : (
+            <div className="space-y-2">
+              {invResults.map((o) => {
+                const b = buyers[o.buyer_id];
+                const total = o.quoted_price != null ? Number(o.quoted_price) * o.quantity : null;
+                return (
+                  <div
+                    key={o.id}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold">{o.invoice_number ?? "غير مدفوع"}</span>
+                        {total != null && (
+                          <span className="text-primary font-extrabold text-sm">{formatSAR(total)}</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                        {o.product?.name ?? o.custom_product ?? "منتج"} • {o.supplier?.name ?? "—"}
+                        {b?.business_name ? ` • ${b.business_name}` : ""}
+                        {b?.phone ? ` • ${b.phone}` : ""}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => printOrderInvoice(o, b)}
+                      disabled={!o.paid_at}
+                      title={o.paid_at ? "طباعة الفاتورة" : "لا توجد فاتورة (لم يُدفع بعد)"}
+                      className="inline-flex items-center gap-1 rounded-xl border border-border px-3 py-1.5 text-xs font-bold hover:bg-secondary disabled:opacity-50 shrink-0"
+                    >
+                      <Printer className="h-3.5 w-3.5" /> طباعة
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
         {/* الرسوم البيانية */}
         <div className="grid lg:grid-cols-3 gap-4 mb-8">
           <ChartCard title="الطلبات حسب الحالة">
@@ -321,6 +399,18 @@ function AdminPage() {
       <Footer />
     </div>
   );
+}
+
+function printOrderInvoice(o: AdminOrder, b?: BuyerContact) {
+  printInvoice({
+    invoiceNumber: o.invoice_number,
+    date: o.paid_at,
+    supplier: { name: o.supplier?.name },
+    buyer: { name: b?.business_name, city: b?.city, phone: b?.phone },
+    productName: o.product?.name ?? o.custom_product ?? "منتج",
+    quantity: o.quantity,
+    unitPrice: Number(o.quoted_price ?? 0),
+  });
 }
 
 /* ---------- مكوّنات مساعدة ---------- */
