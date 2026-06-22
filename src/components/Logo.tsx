@@ -1,47 +1,54 @@
-// شعار «مَدَدْ»: كرتون جملة مفتوح تبرز منه ملعقة وقنينة — يوحي بتجارة الجملة للمطاعم والمحلات.
-export function Logo({ size = 38, showText = true }: { size?: number; showText?: boolean }) {
+// شعار «مَدَدْ» الحروفي: الكلمة نفسها هي التصميم — حروف متّصلة بتدرّج لوني،
+// مدموج معها كرتون جملة تبرز منه ملعقة وقنينة (يجلس الاسم داخل صندوق التموين).
+export function Logo({ size = 40 }: { size?: number }) {
   return (
-    <div className="flex items-center gap-2">
-      <div
-        style={{ width: size, height: size }}
-        className="rounded-2xl bg-gradient-to-br from-primary to-teal-700 grid place-items-center shadow-md shrink-0"
-        aria-label="شعار مدد"
+    <svg
+      viewBox="0 0 156 78"
+      height={size}
+      role="img"
+      aria-label="مدد"
+      className="block w-auto"
+      style={{ overflow: "visible" }}
+    >
+      <defs>
+        <linearGradient id="madadGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#10b981" />
+          <stop offset="1" stopColor="#0d7d6b" />
+        </linearGradient>
+      </defs>
+
+      {/* عناصر التموين تبرز من فوق الكرتون (خلف الكلمة) */}
+      {/* ملعقة */}
+      <ellipse cx="60" cy="40" rx="3" ry="4" fill="#10b981" />
+      <rect x="58.8" y="43" width="2.4" height="12" rx="1.2" fill="#10b981" />
+      {/* قنينة */}
+      <rect x="92" y="36.5" width="2.4" height="3.2" rx="0.5" fill="#0d7d6b" />
+      <rect x="90" y="39.5" width="6.4" height="14" rx="2.2" fill="#0d7d6b" />
+
+      {/* الكلمة «مدد» كحروف متّصلة بتدرّج لوني */}
+      <text
+        x="150"
+        y="52"
+        textAnchor="end"
+        fontFamily="Cairo, system-ui, sans-serif"
+        fontWeight={900}
+        fontSize="46"
+        fill="url(#madadGrad)"
+        style={{ letterSpacing: "-3px" }}
       >
-        <svg
-          viewBox="0 0 32 32"
-          width={size * 0.66}
-          height={size * 0.66}
-          fill="none"
-          role="img"
-        >
-          {/* لسانا الكرتون المفتوحان */}
-          <path d="M6 13 L3.2 9 L12.6 11.2 Z" fill="#ffffff" fillOpacity="0.8" />
-          <path d="M26 13 L28.8 9 L19.4 11.2 Z" fill="#ffffff" fillOpacity="0.8" />
+        مدد
+      </text>
 
-          {/* ملعقة بارزة */}
-          <ellipse cx="11.4" cy="6.6" rx="2.1" ry="2.8" fill="#ffffff" />
-          <rect x="10.6" y="8.4" width="1.5" height="7" rx="0.75" fill="#ffffff" />
-
-          {/* قنينة بارزة */}
-          <rect x="17.7" y="4.9" width="1.7" height="2.3" rx="0.4" fill="#ffffff" />
-          <rect x="16.4" y="6.9" width="4.2" height="8.5" rx="1.4" fill="#ffffff" />
-
-          {/* جسم الكرتون (أمام) */}
-          <path
-            d="M6 13 H26 L24.4 27.1 A1.7 1.7 0 0 1 22.7 28.6 H9.3 A1.7 1.7 0 0 1 7.6 27.1 Z"
-            fill="#ffffff"
-          />
-
-          {/* تفاصيل الكرتون: شريط لاصق وخط */}
-          <path d="M16 13 V28.6" stroke="#0f766e" strokeWidth="1.6" strokeLinecap="round" />
-          <path d="M7 17.4 H25" stroke="#0f766e" strokeWidth="1.2" opacity="0.45" />
-        </svg>
-      </div>
-      {showText && (
-        <span className="text-xl font-extrabold tracking-tight" style={{ fontKerning: "normal" }}>
-          مَدَدْ
-        </span>
-      )}
-    </div>
+      {/* كرتون الجملة المفتوح — تجلس فيه الكلمة */}
+      <path d="M30 58 L26 51 L44 55 Z" fill="url(#madadGrad)" opacity="0.85" />
+      <path d="M126 58 L130 51 L112 55 Z" fill="url(#madadGrad)" opacity="0.85" />
+      <path
+        d="M30 58 H126 L121 75 A3 3 0 0 1 118 77 H38 A3 3 0 0 1 35 75 Z"
+        fill="url(#madadGrad)"
+      />
+      {/* شريط الكرتون */}
+      <path d="M78 58 V77" stroke="#ffffff" strokeWidth="2" opacity="0.55" strokeLinecap="round" />
+      <path d="M34 64 H122" stroke="#ffffff" strokeWidth="1.5" opacity="0.4" />
+    </svg>
   );
 }
