@@ -5,7 +5,6 @@ import { BadgeCheck, MapPin, Plus, Calendar } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Rating } from "@/components/Rating";
-import { IncomingQuotes } from "@/components/IncomingQuotes";
 import { BulkImport } from "@/components/BulkImport";
 import { SupplierProductRow } from "@/components/SupplierProductRow";
 import { PriceTiersEditor, cleanTiers } from "@/components/PriceTiersEditor";
@@ -266,13 +265,8 @@ function DashboardPage() {
               </div>
             )}
 
-            {/* طلبات الزبائن أولاً وأبرز */}
-            <div className="mt-6">
-              <IncomingQuotes supplierId={supplier.id} />
-            </div>
-
             <details className="mt-6 rounded-3xl bg-card border border-border p-5">
-              <summary className="cursor-pointer font-bold text-sm">تعديل بيانات المتجر</summary>
+              <summary className="cursor-pointer font-bold text-sm">⚙️ تعديل بيانات المتجر</summary>
               <form onSubmit={saveSupplier} className="grid md:grid-cols-2 gap-3 mt-4">
                 <input
                   required
@@ -364,11 +358,8 @@ function DashboardPage() {
               </form>
             </details>
 
-            <div className="mt-6">
-              <BulkImport supplierId={supplier.id} onDone={refetch} />
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-6 mt-6">
+            <h2 className="mt-8 mb-3 text-lg font-extrabold">منتجاتك وعروضك</h2>
+            <div className="grid lg:grid-cols-2 gap-6">
               <div className="rounded-3xl bg-card border border-border p-6">
                 <h3 className="font-bold text-lg flex items-center gap-2">
                   <Plus className="h-5 w-5" /> إضافة منتج جديد
@@ -503,6 +494,10 @@ function DashboardPage() {
               </div>
             </div>
 
+            <div className="mt-8">
+              <h2 className="mb-3 text-lg font-extrabold">استيراد دفعة منتجات</h2>
+              <BulkImport supplierId={supplier.id} onDone={refetch} />
+            </div>
           </>
         )}
       </main>

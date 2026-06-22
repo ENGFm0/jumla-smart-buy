@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { LayoutDashboard, LogIn, ShoppingCart, Menu, X } from "lucide-react";
+import { LogIn, ShoppingCart, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { NotificationBell } from "./NotificationBell";
 import { useAuth, signOut, getUserRoles } from "@/lib/auth";
@@ -40,12 +40,15 @@ export function Navbar() {
 
   const links: NavLink[] = [{ to: "/", label: "الرئيسية" }];
   if (user) {
-    links.push({ to: "/favorites", label: "المفضّلة" });
-    // المورّد لا يطلب — نخفي «طلباتي» و«الشراء بالآجل» عنه، وتظهر له لوحته
     if (isSupplier) {
-      links.push({ to: "/dashboard", label: "لوحة المورّد" });
+      // المورّد: الطلبات الواردة + لوحته (بدون مفضّلة/طلباتي/شراء بالآجل)
+      links.push(
+        { to: "/incoming", label: "الطلبات الواردة" },
+        { to: "/dashboard", label: "لوحة المورّد" },
+      );
     } else {
       links.push(
+        { to: "/favorites", label: "المفضّلة" },
         { to: "/my-requests", label: "طلباتي" },
         { to: "/financing", label: "شراء بالآجل" },
       );
@@ -126,15 +129,6 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
-            {user && isSupplier && (
-              <Link
-                to="/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-3 py-2.5 text-sm font-bold text-primary inline-flex items-center gap-2"
-              >
-                <LayoutDashboard className="h-4 w-4" /> لوحتي
-              </Link>
-            )}
             {user && (
               <button
                 onClick={() => {

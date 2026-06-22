@@ -21,6 +21,7 @@ import { Route as PayReturnRouteImport } from './routes/pay.return'
 import { Route as AuthenticatedRequestProductRouteImport } from './routes/_authenticated/request-product'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMyRequestsRouteImport } from './routes/_authenticated/my-requests'
+import { Route as AuthenticatedIncomingRouteImport } from './routes/_authenticated/incoming'
 import { Route as AuthenticatedFinancingRouteImport } from './routes/_authenticated/financing'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -89,6 +90,11 @@ const AuthenticatedMyRequestsRoute = AuthenticatedMyRequestsRouteImport.update({
   path: '/my-requests',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIncomingRoute = AuthenticatedIncomingRouteImport.update({
+  id: '/incoming',
+  path: '/incoming',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFinancingRoute = AuthenticatedFinancingRouteImport.update({
   id: '/financing',
   path: '/financing',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/financing': typeof AuthenticatedFinancingRoute
+  '/incoming': typeof AuthenticatedIncomingRoute
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/request-product': typeof AuthenticatedRequestProductRoute
@@ -157,6 +164,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/financing': typeof AuthenticatedFinancingRoute
+  '/incoming': typeof AuthenticatedIncomingRoute
   '/my-requests': typeof AuthenticatedMyRequestsRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/request-product': typeof AuthenticatedRequestProductRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/financing': typeof AuthenticatedFinancingRoute
+  '/_authenticated/incoming': typeof AuthenticatedIncomingRoute
   '/_authenticated/my-requests': typeof AuthenticatedMyRequestsRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/request-product': typeof AuthenticatedRequestProductRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/favorites'
     | '/financing'
+    | '/incoming'
     | '/my-requests'
     | '/onboarding'
     | '/request-product'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/favorites'
     | '/financing'
+    | '/incoming'
     | '/my-requests'
     | '/onboarding'
     | '/request-product'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/financing'
+    | '/_authenticated/incoming'
     | '/_authenticated/my-requests'
     | '/_authenticated/onboarding'
     | '/_authenticated/request-product'
@@ -349,6 +361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMyRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/incoming': {
+      id: '/_authenticated/incoming'
+      path: '/incoming'
+      fullPath: '/incoming'
+      preLoaderRoute: typeof AuthenticatedIncomingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/financing': {
       id: '/_authenticated/financing'
       path: '/financing'
@@ -408,6 +427,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedFinancingRoute: typeof AuthenticatedFinancingRoute
+  AuthenticatedIncomingRoute: typeof AuthenticatedIncomingRoute
   AuthenticatedMyRequestsRoute: typeof AuthenticatedMyRequestsRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedRequestProductRoute: typeof AuthenticatedRequestProductRoute
@@ -421,6 +441,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedFinancingRoute: AuthenticatedFinancingRoute,
+  AuthenticatedIncomingRoute: AuthenticatedIncomingRoute,
   AuthenticatedMyRequestsRoute: AuthenticatedMyRequestsRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedRequestProductRoute: AuthenticatedRequestProductRoute,
