@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox, ChevronDown, Store, ExternalLink, PackageSearch, Search, X } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { OrderCard } from "@/components/OrderCard";
+import { CollapsibleOrderCard } from "@/components/OrderCard";
 import { OrderTabs } from "@/components/OrderTabs";
 import { getMyQuoteRequests } from "@/lib/quotes";
 import {
@@ -237,9 +237,9 @@ function MyRequestsPage() {
                   </div>
 
                   {isOpen && (
-                    <div className="border-t border-border p-3 sm:p-4 space-y-5 bg-secondary/20">
+                    <div className="border-t border-border p-3 sm:p-4 space-y-2.5 bg-secondary/20">
                       {g.orders.map((r) => (
-                        <OrderCard key={r.id} order={r} role="buyer" onChange={refresh} />
+                        <CollapsibleOrderCard key={r.id} order={r} role="buyer" onChange={refresh} />
                       ))}
                     </div>
                   )}

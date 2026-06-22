@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox, ChevronDown, Store } from "lucide-react";
-import { OrderCard } from "@/components/OrderCard";
+import { CollapsibleOrderCard } from "@/components/OrderCard";
 import { OrderTabs } from "@/components/OrderTabs";
 import { getSupplierQuoteRequests } from "@/lib/quotes";
 import { getBuyerContactsByIds } from "@/lib/orders";
@@ -144,9 +144,9 @@ export function IncomingQuotes({ supplierId }: { supplierId: string }) {
                 </div>
 
                 {isOpen && (
-                  <div className="border-t border-border p-3 space-y-4 bg-secondary/20">
+                  <div className="border-t border-border p-3 space-y-2.5 bg-secondary/20">
                     {g.orders.map((r) => (
-                      <OrderCard key={r.id} order={r} role="supplier" onChange={refresh} />
+                      <CollapsibleOrderCard key={r.id} order={r} role="supplier" onChange={refresh} />
                     ))}
                   </div>
                 )}

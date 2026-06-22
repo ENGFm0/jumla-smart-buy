@@ -20,6 +20,7 @@ import {
   XCircle,
   PackageCheck,
   Hash,
+  ChevronDown,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { respondToQuote, createQuoteRequest, createProductRequest } from "@/lib/quotes";
@@ -38,6 +39,7 @@ import {
 import { OrderTracker } from "@/components/OrderTracker";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderInvoice } from "@/components/OrderInvoice";
+import { needsAction, lastActivity, fmtDayMonth } from "@/lib/orderFilters";
 import { formatSAR, type QuoteRequestDetailed, type QuoteStatus } from "@/types";
 
 // حالة الطلب الحالية → نص + ألوان + أيقونة (تقود شريط البطاقة العلوي والشارة)
@@ -86,10 +88,12 @@ export function OrderCard({
   order,
   role,
   onChange,
+  embedded = false,
 }: {
   order: QuoteRequestDetailed;
   role: Role;
   onChange: () => void;
+  embedded?: boolean;
 }) {
   const offerExists = order.status === "quoted" || order.quoted_price != null;
   const active = order.status !== "rejected" && !order.cancelled_at;
@@ -101,12 +105,19 @@ export function OrderCard({
   const total = order.quoted_price != null ? Number(order.quoted_price) * order.quantity : null;
 
   return (
-    <div className="rounded-3xl bg-card border border-border p-5 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      {/* شريط الحالة العلوي الملوّن */}
-      <div className={`-mx-5 -mt-5 mb-4 h-1.5 ${meta.accent}`} />
+    <div
+      className={
+        embedded
+          ? ""
+          : "rounded-3xl bg-card border border-border p-5 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      }
+    >
+      {!embedded && <div className={`-mx-5 -mt-5 mb-4 h-1.5 ${meta.accent}`} />}
 
-      {/* الترويسة */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
+      {!embedded && (
+        <>
+          {/* الترويسة */}
+          <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3 min-w-0">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-soft to-secondary text-primary flex items-center justify-center shrink-0">
             <ProductIcon className="h-6 w-6" />
@@ -159,10 +170,12 @@ export function OrderCard({
             الإجمالي: {formatSAR(total)}
           </span>
         )}
-      </div>
+          </div>
+        </>
+      )}
 
       {/* المتتبّع المرئي */}
-      <div className="mt-5">
+      <div className={embedded ? "" : "mt-5"}>
         <OrderTracker order={order} />
       </div>
 
@@ -249,6 +262,68 @@ export function OrderCard({
             <ReorderButton order={order} onChange={onChange} />
           )}
       </div>
+    </div>
+  );
+}
+
+// صفّ طلب مختصر يتوسّع للتفاصيل — لترتيب القوائم الطويلة تحت كل مورّد/عميل
+export function CollapsibleOrderCard({
+  order,
+  role,
+  onChange,
+}: {
+  order: QuoteRequestDetailed;
+  role: Role;
+  onChange: () => void;
+}) {
+  const action = needsAction(order, role);
+  const [open, setOpen] = useState(action);
+  const meta = stageMeta(order);
+  const StatusIcon = meta.Icon;
+  const ProductIcon = (order.product?.icon
+    ? ((Icons as any)[order.product.icon] ?? Icons.Package)
+    : Icons.Package) as LucideIcon;
+  const total = order.quoted_price != null ? Number(order.quoted_price) * order.quantity : null;
+
+  return (
+    <div
+      className={`rounded-2xl border bg-card overflow-hidden transition ${
+        action ? "border-amber-300" : "border-border"
+      }`}
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-2.5 p-3 text-right hover:bg-secondary/40 transition"
+      >
+        <span className={`h-9 w-1.5 rounded-full shrink-0 ${meta.accent}`} />
+        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-soft to-secondary text-primary flex items-center justify-center shrink-0">
+          <ProductIcon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="font-bold truncate">
+            {order.product?.name ?? order.custom_product ?? "منتج"}
+          </div>
+          <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
+            <span>الكمية {order.quantity}</span>
+            {total != null && <span>· {formatSAR(total)}</span>}
+            <span>· {fmtDayMonth(lastActivity(order))}</span>
+            {action && <span className="font-bold text-amber-700">· يحتاج إجراء</span>}
+          </div>
+        </div>
+        <span
+          className={`hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold shrink-0 ${meta.badge}`}
+        >
+          <StatusIcon className="h-3 w-3" /> {meta.label}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="border-t border-border p-4">
+          <OrderCard order={order} role={role} onChange={onChange} embedded />
+        </div>
+      )}
     </div>
   );
 }
