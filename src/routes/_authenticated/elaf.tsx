@@ -154,10 +154,20 @@ function AdminPage() {
     return { byStatus, days, topSuppliers, sup, totalSales };
   }, [orders]);
 
-  const activeOrders = useMemo(
-    () => orders.filter((o) => classifyOrder(o as never) === "ongoing").slice(0, 12),
-    [orders],
-  );
+  // الطلبات الجارية مجمّعة تحت كل مورّد
+  const activeBySupplier = useMemo(() => {
+    const map = new Map<string, { name: string; orders: AdminOrder[] }>();
+    for (const o of orders) {
+      if (classifyOrder(o as never) !== "ongoing") continue;
+      const sid = o.supplier?.id ?? o.supplier_id ?? "—";
+      const g = map.get(sid) ?? { name: o.supplier?.name ?? "—", orders: [] };
+      g.orders.push(o);
+      map.set(sid, g);
+    }
+    return [...map.entries()]
+      .map(([id, g]) => ({ id, ...g }))
+      .sort((a, b) => b.orders.length - a.orders.length);
+  }, [orders]);
 
   const pendingBank = useMemo(() => suppliers.filter((s) => s.iban && !s.verified).length, [suppliers]);
   const filteredSuppliers = useMemo(() => {
@@ -342,11 +352,11 @@ function AdminPage() {
           <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" /> الطلبات الجارية الآن ({analytics.byStatus.ongoing})
           </h2>
-          <div className="space-y-2">
-            {activeOrders.map((o) => (
-              <AdminOrderDetail key={o.id} order={o} buyer={buyers[o.buyer_id]} />
+          <div className="space-y-3">
+            {activeBySupplier.map((g) => (
+              <ActiveSupplierGroup key={g.id} name={g.name} orders={g.orders} buyers={buyers} />
             ))}
-            {activeOrders.length === 0 && (
+            {activeBySupplier.length === 0 && (
               <div className="text-center text-sm text-muted-foreground py-6">لا توجد طلبات جارية الآن.</div>
             )}
           </div>
@@ -405,6 +415,44 @@ function printOrderInvoice(o: AdminOrder, b?: BuyerContact) {
     quantity: o.quantity,
     unitPrice: Number(o.quoted_price ?? 0),
   });
+}
+
+function ActiveSupplierGroup({
+  name,
+  orders,
+  buyers,
+}: {
+  name: string;
+  orders: AdminOrder[];
+  buyers: Record<string, BuyerContact>;
+}) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="rounded-2xl border border-border overflow-hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-3 p-3 bg-secondary/30 hover:bg-secondary/50 transition"
+      >
+        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-teal-600 text-white flex items-center justify-center font-extrabold text-sm shrink-0 shadow-sm">
+          {name.charAt(0)}
+        </div>
+        <div className="min-w-0 flex-1 text-right">
+          <div className="font-bold truncate">{name}</div>
+          <div className="text-xs text-muted-foreground">{orders.length} طلب جارٍ</div>
+        </div>
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="p-2 space-y-2 bg-secondary/10">
+          {orders.map((o) => (
+            <AdminOrderDetail key={o.id} order={o} buyer={buyers[o.buyer_id]} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /* ---------- مكوّنات مساعدة ---------- */
