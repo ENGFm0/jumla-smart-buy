@@ -182,7 +182,7 @@ function RequestProductPage() {
 
           <button
             disabled={saving}
-            className="w-full rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2"
+            className="w-full rounded-full bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-primary/20 transition"
           >
             <CheckCircle2 className="h-5 w-5" />
             {saving

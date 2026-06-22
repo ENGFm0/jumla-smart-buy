@@ -182,7 +182,7 @@ function SupplierForm({ userId, onDone }: { userId: string; onDone: () => void }
           </div>
         </div>
         {error && <div className="md:col-span-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</div>}
-        <button disabled={saving} className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60">
+        <button disabled={saving} className="md:col-span-2 rounded-full bg-primary text-primary-foreground py-3 font-bold hover:shadow-lg hover:shadow-primary/20 transition disabled:opacity-60">
           {saving ? "..." : "حفظ ومتابعة"}
         </button>
       </form>
@@ -238,7 +238,7 @@ function BuyerForm({ onDone }: { onDone: () => void }) {
         <input value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} placeholder="رابط الموقع في خرائط قوقل (اختياري)" className={`md:col-span-2 ${input}`} />
         <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="رقم الجوال" className={`md:col-span-2 ${input}`} />
         {error && <div className="md:col-span-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</div>}
-        <button disabled={saving} className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60">
+        <button disabled={saving} className="md:col-span-2 rounded-full bg-primary text-primary-foreground py-3 font-bold hover:shadow-lg hover:shadow-primary/20 transition disabled:opacity-60">
           {saving ? "..." : "حفظ ومتابعة"}
         </button>
       </form>

@@ -4,6 +4,7 @@ import { HeartOff } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
+import { Reveal } from "@/components/Reveal";
 import { getFavoriteIds } from "@/lib/favorites";
 import { getProductsWithStats } from "@/lib/products";
 
@@ -41,15 +42,17 @@ function FavoritesPage() {
             </p>
             <Link
               to="/search"
-              className="inline-block mt-5 rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 font-bold"
+              className="inline-block mt-5 rounded-full bg-primary text-primary-foreground px-6 py-2.5 font-bold hover:scale-105 transition"
             >
               تصفّح المنتجات
             </Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {products.map((p, i) => (
+              <Reveal key={p.id} delay={Math.min(i, 8) * 50}>
+                <ProductCard product={p} />
+              </Reveal>
             ))}
           </div>
         )}

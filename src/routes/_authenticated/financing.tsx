@@ -383,7 +383,7 @@ function FinancingPage() {
                     </p>
                     <Link
                       to="/search"
-                      className="inline-block rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold"
+                      className="inline-block rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold"
                     >
                       تصفّح المنتجات
                     </Link>
@@ -525,7 +525,7 @@ function FinancingPage() {
                 type="button"
                 onClick={next}
                 disabled={step === 1 && !step1Valid}
-                className="inline-flex items-center gap-1 rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold disabled:opacity-50"
+                className="inline-flex items-center gap-1 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold disabled:opacity-50"
               >
                 التالي <ChevronLeft className="h-4 w-4" />
               </button>
@@ -534,7 +534,7 @@ function FinancingPage() {
                 type="button"
                 onClick={submit}
                 disabled={saving}
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-bold disabled:opacity-60"
               >
                 <CheckCircle2 className="h-4 w-4" /> {saving ? "جارٍ الإرسال…" : "إرسال الطلب"}
               </button>

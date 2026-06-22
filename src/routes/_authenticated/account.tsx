@@ -83,7 +83,7 @@ function AccountPage() {
             )}
             <button
               disabled={saving}
-              className="w-full rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60"
+              className="w-full rounded-full bg-primary text-primary-foreground py-3 font-bold hover:shadow-lg hover:shadow-primary/20 transition disabled:opacity-60"
             >
               {saving ? "..." : "حفظ التغييرات"}
             </button>

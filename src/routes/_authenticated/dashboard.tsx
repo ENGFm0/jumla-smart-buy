@@ -221,7 +221,7 @@ function DashboardPage() {
                 placeholder="رقم واتساب (بدون +)"
                 className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm"
               />
-              <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">
+              <button className="md:col-span-2 rounded-full bg-primary text-primary-foreground py-3 font-bold hover:shadow-lg hover:shadow-primary/20 transition">
                 حفظ
               </button>
             </form>
@@ -352,7 +352,7 @@ function DashboardPage() {
                     {saveMsg.text}
                   </div>
                 )}
-                <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">
+                <button className="md:col-span-2 rounded-full bg-primary text-primary-foreground py-3 font-bold hover:shadow-lg hover:shadow-primary/20 transition">
                   حفظ التعديلات
                 </button>
               </form>
@@ -472,7 +472,7 @@ function DashboardPage() {
                   )}
                   <button
                     disabled={adding}
-                    className="col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60"
+                    className="col-span-2 rounded-full bg-primary text-primary-foreground py-3 font-bold hover:shadow-lg hover:shadow-primary/20 transition disabled:opacity-60"
                   >
                     {adding ? "..." : "حفظ المنتج"}
                   </button>
