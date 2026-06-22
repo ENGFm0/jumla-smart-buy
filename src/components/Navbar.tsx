@@ -54,7 +54,7 @@ export function Navbar() {
       );
     }
     links.push({ to: "/account", label: "حسابي" });
-    if (isAdmin) links.push({ to: "/ctrl-7x9q2k", label: "الإدارة" });
+    if (isAdmin) links.push({ to: "/elaf", label: "الإدارة" });
   }
 
   return (

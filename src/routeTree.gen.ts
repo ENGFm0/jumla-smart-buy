@@ -24,8 +24,8 @@ import { Route as AuthenticatedMyRequestsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedIncomingRouteImport } from './routes/_authenticated/incoming'
 import { Route as AuthenticatedFinancingRouteImport } from './routes/_authenticated/financing'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
+import { Route as AuthenticatedElafRouteImport } from './routes/_authenticated/elaf'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedCtrl7x9q2kRouteImport } from './routes/_authenticated/ctrl-7x9q2k'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedChatIdRouteImport } from './routes/_authenticated/chat.$id'
@@ -105,14 +105,14 @@ const AuthenticatedFavoritesRoute = AuthenticatedFavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedElafRoute = AuthenticatedElafRouteImport.update({
+  id: '/elaf',
+  path: '/elaf',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCtrl7x9q2kRoute = AuthenticatedCtrl7x9q2kRouteImport.update({
-  id: '/ctrl-7x9q2k',
-  path: '/ctrl-7x9q2k',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCartRoute = AuthenticatedCartRouteImport.update({
@@ -139,8 +139,8 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/cart': typeof AuthenticatedCartRoute
-  '/ctrl-7x9q2k': typeof AuthenticatedCtrl7x9q2kRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/elaf': typeof AuthenticatedElafRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/financing': typeof AuthenticatedFinancingRoute
   '/incoming': typeof AuthenticatedIncomingRoute
@@ -160,8 +160,8 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/account': typeof AuthenticatedAccountRoute
   '/cart': typeof AuthenticatedCartRoute
-  '/ctrl-7x9q2k': typeof AuthenticatedCtrl7x9q2kRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/elaf': typeof AuthenticatedElafRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/financing': typeof AuthenticatedFinancingRoute
   '/incoming': typeof AuthenticatedIncomingRoute
@@ -183,8 +183,8 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
-  '/_authenticated/ctrl-7x9q2k': typeof AuthenticatedCtrl7x9q2kRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/elaf': typeof AuthenticatedElafRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/financing': typeof AuthenticatedFinancingRoute
   '/_authenticated/incoming': typeof AuthenticatedIncomingRoute
@@ -206,8 +206,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/account'
     | '/cart'
-    | '/ctrl-7x9q2k'
     | '/dashboard'
+    | '/elaf'
     | '/favorites'
     | '/financing'
     | '/incoming'
@@ -227,8 +227,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/account'
     | '/cart'
-    | '/ctrl-7x9q2k'
     | '/dashboard'
+    | '/elaf'
     | '/favorites'
     | '/financing'
     | '/incoming'
@@ -249,8 +249,8 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/account'
     | '/_authenticated/cart'
-    | '/_authenticated/ctrl-7x9q2k'
     | '/_authenticated/dashboard'
+    | '/_authenticated/elaf'
     | '/_authenticated/favorites'
     | '/_authenticated/financing'
     | '/_authenticated/incoming'
@@ -382,18 +382,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFavoritesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/elaf': {
+      id: '/_authenticated/elaf'
+      path: '/elaf'
+      fullPath: '/elaf'
+      preLoaderRoute: typeof AuthenticatedElafRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ctrl-7x9q2k': {
-      id: '/_authenticated/ctrl-7x9q2k'
-      path: '/ctrl-7x9q2k'
-      fullPath: '/ctrl-7x9q2k'
-      preLoaderRoute: typeof AuthenticatedCtrl7x9q2kRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/cart': {
@@ -423,8 +423,8 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedCartRoute: typeof AuthenticatedCartRoute
-  AuthenticatedCtrl7x9q2kRoute: typeof AuthenticatedCtrl7x9q2kRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedElafRoute: typeof AuthenticatedElafRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedFinancingRoute: typeof AuthenticatedFinancingRoute
   AuthenticatedIncomingRoute: typeof AuthenticatedIncomingRoute
@@ -437,8 +437,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedCartRoute: AuthenticatedCartRoute,
-  AuthenticatedCtrl7x9q2kRoute: AuthenticatedCtrl7x9q2kRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedElafRoute: AuthenticatedElafRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedFinancingRoute: AuthenticatedFinancingRoute,
   AuthenticatedIncomingRoute: AuthenticatedIncomingRoute,

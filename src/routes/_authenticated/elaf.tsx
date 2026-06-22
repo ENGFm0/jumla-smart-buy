@@ -28,7 +28,7 @@ import {
   deleteProduct,
 } from "@/lib/admin";
 
-export const Route = createFileRoute("/_authenticated/ctrl-7x9q2k")({
+export const Route = createFileRoute("/_authenticated/elaf")({
   head: () => ({ meta: [{ title: "لوحة الإدارة — مدد" }] }),
   component: AdminPage,
 });
