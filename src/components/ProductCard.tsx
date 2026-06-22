@@ -17,7 +17,7 @@ export function ProductCard({ product }: { product: ProductWithStats }) {
     <Link
       to="/product/$id"
       params={{ id: product.id }}
-      className="group block rounded-3xl bg-card border border-border hover:border-primary hover:shadow-lg transition p-5"
+      className="group block rounded-3xl bg-card border border-border hover:border-primary hover:shadow-lg hover:-translate-y-0.5 transition duration-200 p-5"
     >
       <div className="flex items-start gap-3">
         {product.image_url ? (

@@ -57,6 +57,23 @@ function Index() {
             <p className="mt-4 text-xs text-white/70">
               تصفّح بحرية — سجّل الدخول لعرض بيانات الموردين والتواصل وطلب عروض الأسعار.
             </p>
+
+            {/* شريط أرقام سريع */}
+            <div className="mt-7 flex flex-wrap gap-3">
+              {[
+                { v: `${categories.length}+`, l: "فئة" },
+                { v: `${featured.length}+`, l: "منتج" },
+                { v: "فوري", l: "مقارنة الأسعار" },
+              ].map((s) => (
+                <div
+                  key={s.l}
+                  className="rounded-2xl bg-white/10 backdrop-blur px-4 py-2.5 border border-white/15"
+                >
+                  <div className="text-xl font-extrabold leading-none">{s.v}</div>
+                  <div className="text-[11px] text-white/75 mt-1">{s.l}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -80,7 +97,7 @@ function Index() {
               key={c.id}
               to="/search"
               search={{ cat: c.id } as any}
-              className="block rounded-3xl border border-border bg-card hover:border-primary hover:shadow-md transition p-5 text-center"
+              className="block rounded-3xl border border-border bg-card hover:border-primary hover:shadow-md hover:-translate-y-0.5 transition duration-200 p-5 text-center"
             >
               <div className="mx-auto mb-3 w-fit">
                 <CategoryChip icon={c.icon} name={c.name} asButton={false} />
@@ -114,8 +131,11 @@ function Index() {
                 desc: "كلّم المورّد مباشرة عبر واتساب أو الهاتف وأنهي طلبك.",
               },
             ].map(({ Icon, title, desc }) => (
-              <div key={title} className="rounded-3xl bg-card border border-border p-6">
-                <div className="rounded-2xl bg-brand-soft text-primary p-3 w-fit">
+              <div
+                key={title}
+                className="rounded-3xl bg-card border border-border p-6 hover:shadow-md hover:-translate-y-0.5 transition duration-200"
+              >
+                <div className="rounded-2xl bg-gradient-to-br from-primary to-teal-600 text-white p-3 w-fit shadow-sm">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-4 font-bold text-lg">{title}</h3>
