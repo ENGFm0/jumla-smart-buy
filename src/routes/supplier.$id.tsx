@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Rating } from "@/components/Rating";
 import { ContactButtons } from "@/components/ContactButtons";
 import { SupplierReviews } from "@/components/SupplierReviews";
+import { Reveal } from "@/components/Reveal";
 import { getSupplierById } from "@/lib/suppliers";
 import { getProductsBySupplier } from "@/lib/products";
 import { formatSAR } from "@/types";
@@ -48,8 +49,9 @@ function SupplierPage() {
         </Link>
 
         {/* ترويسة المورّد */}
-        <div className="rounded-3xl bg-gradient-to-br from-primary to-teal-700 text-white p-6 mt-3">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-teal-700 text-white p-6 mt-3 shadow-lg">
+          <div className="pointer-events-none absolute -top-16 -left-10 h-52 w-52 rounded-full bg-white/10 blur-3xl animate-blob" />
+          <div className="relative flex items-start justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-4">
               <span className="h-16 w-16 rounded-2xl bg-white/15 grid place-items-center text-2xl font-extrabold">
                 {supplier.name.charAt(0)}
@@ -99,22 +101,23 @@ function SupplierPage() {
         {/* منتجات المورّد */}
         <h2 className="text-xl font-extrabold mt-8 mb-3">منتجات المورّد ({products.length})</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-          {products.map((row) => (
-            <Link
-              key={row.id}
-              to="/product/$id"
-              params={{ id: row.product.id }}
-              className="rounded-3xl bg-card border border-border p-4 hover:border-primary transition flex items-center gap-3"
-            >
-              <div className="rounded-2xl bg-brand-soft text-primary p-3 shrink-0">
-                <Package className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="font-bold truncate">{row.product.name}</div>
-                <div className="text-xs text-muted-foreground">{row.product.unit}</div>
-              </div>
-              <div className="font-extrabold text-primary tabular-nums">{formatSAR(Number(row.price))}</div>
-            </Link>
+          {products.map((row, i) => (
+            <Reveal key={row.id} delay={Math.min(i, 8) * 40}>
+              <Link
+                to="/product/$id"
+                params={{ id: row.product.id }}
+                className="h-full rounded-3xl bg-card border border-border p-4 hover:border-primary hover:shadow-md hover:-translate-y-1 transition duration-200 flex items-center gap-3"
+              >
+                <div className="rounded-2xl bg-gradient-to-br from-brand-soft to-secondary text-primary p-3 shrink-0">
+                  <Package className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold truncate">{row.product.name}</div>
+                  <div className="text-xs text-muted-foreground">{row.product.unit}</div>
+                </div>
+                <div className="font-extrabold text-primary tabular-nums">{formatSAR(Number(row.price))}</div>
+              </Link>
+            </Reveal>
           ))}
           {products.length === 0 && (
             <div className="text-center text-sm text-muted-foreground py-6 sm:col-span-2 lg:col-span-3">

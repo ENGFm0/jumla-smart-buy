@@ -159,7 +159,10 @@ function CartPage() {
               const saved = baseTotal - total;
               const vatIncluded = total - total / 1.15;
               return (
-                <div key={g.supplierId} className="rounded-3xl bg-card border border-border p-5">
+                <div
+                  key={g.supplierId}
+                  className="rounded-3xl bg-card border border-border p-5 shadow-sm hover:shadow-md transition-shadow"
+                >
                   <div className="flex items-center gap-2 font-bold mb-3">
                     <Store className="h-4 w-4 text-primary" />
                     {g.supplierName}
@@ -267,7 +270,7 @@ function CartPage() {
                   <button
                     onClick={() => checkout(g)}
                     disabled={busy === g.supplierId}
-                    className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60"
+                    className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground py-3 font-bold disabled:opacity-60 hover:shadow-lg hover:shadow-primary/20 transition"
                   >
                     <CreditCard className="h-4 w-4" />
                     {busy === g.supplierId ? "جارٍ الإتمام…" : `إتمام الشراء (${formatSAR(total)})`}
