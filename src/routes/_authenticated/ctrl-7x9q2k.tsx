@@ -28,7 +28,7 @@ import {
   deleteProduct,
 } from "@/lib/admin";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/_authenticated/ctrl-7x9q2k")({
   head: () => ({ meta: [{ title: "لوحة الإدارة — مدد" }] }),
   component: AdminPage,
 });
@@ -106,15 +106,18 @@ function AdminPage() {
     );
   }
 
+  // لغير الأدمن: صفحة محايدة لا تكشف وجود لوحة إدارة (تقليل التخمين/الفحص)
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="container mx-auto px-4 py-16 flex-1">
           <div className="max-w-md mx-auto text-center rounded-3xl border border-border p-10">
-            <ShieldAlert className="h-12 w-12 mx-auto text-rose-500" />
-            <h1 className="font-extrabold text-xl mt-3">غير مصرّح</h1>
-            <p className="text-sm text-muted-foreground mt-1">هذه الصفحة مخصّصة للإدارة فقط.</p>
+            <ShieldAlert className="h-12 w-12 mx-auto text-muted-foreground" />
+            <h1 className="font-extrabold text-xl mt-3">الصفحة غير موجودة</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              تعذّر العثور على الصفحة المطلوبة.
+            </p>
           </div>
         </main>
         <Footer />

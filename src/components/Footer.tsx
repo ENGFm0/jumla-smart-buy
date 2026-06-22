@@ -16,7 +16,7 @@ export function Footer() {
           <Link to="/privacy" className="hover:text-primary">
             سياسة الخصوصية
           </Link>
-          <span className="text-[11px] opacity-60">إصدار B26</span>
+          <span className="text-[11px] opacity-60">إصدار B27</span>
         </nav>
       </div>
     </footer>

@@ -25,8 +25,8 @@ import { Route as AuthenticatedIncomingRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedFinancingRouteImport } from './routes/_authenticated/financing'
 import { Route as AuthenticatedFavoritesRouteImport } from './routes/_authenticated/favorites'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCtrl7x9q2kRouteImport } from './routes/_authenticated/ctrl-7x9q2k'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedChatIdRouteImport } from './routes/_authenticated/chat.$id'
 
@@ -110,14 +110,14 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCtrl7x9q2kRoute = AuthenticatedCtrl7x9q2kRouteImport.update({
+  id: '/ctrl-7x9q2k',
+  path: '/ctrl-7x9q2k',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCartRoute = AuthenticatedCartRouteImport.update({
   id: '/cart',
   path: '/cart',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
@@ -138,8 +138,8 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/account': typeof AuthenticatedAccountRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/cart': typeof AuthenticatedCartRoute
+  '/ctrl-7x9q2k': typeof AuthenticatedCtrl7x9q2kRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/financing': typeof AuthenticatedFinancingRoute
@@ -159,8 +159,8 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/account': typeof AuthenticatedAccountRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/cart': typeof AuthenticatedCartRoute
+  '/ctrl-7x9q2k': typeof AuthenticatedCtrl7x9q2kRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/favorites': typeof AuthenticatedFavoritesRoute
   '/financing': typeof AuthenticatedFinancingRoute
@@ -182,8 +182,8 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/terms': typeof TermsRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
+  '/_authenticated/ctrl-7x9q2k': typeof AuthenticatedCtrl7x9q2kRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/favorites': typeof AuthenticatedFavoritesRoute
   '/_authenticated/financing': typeof AuthenticatedFinancingRoute
@@ -205,8 +205,8 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/account'
-    | '/admin'
     | '/cart'
+    | '/ctrl-7x9q2k'
     | '/dashboard'
     | '/favorites'
     | '/financing'
@@ -226,8 +226,8 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/account'
-    | '/admin'
     | '/cart'
+    | '/ctrl-7x9q2k'
     | '/dashboard'
     | '/favorites'
     | '/financing'
@@ -248,8 +248,8 @@ export interface FileRouteTypes {
     | '/search'
     | '/terms'
     | '/_authenticated/account'
-    | '/_authenticated/admin'
     | '/_authenticated/cart'
+    | '/_authenticated/ctrl-7x9q2k'
     | '/_authenticated/dashboard'
     | '/_authenticated/favorites'
     | '/_authenticated/financing'
@@ -389,18 +389,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ctrl-7x9q2k': {
+      id: '/_authenticated/ctrl-7x9q2k'
+      path: '/ctrl-7x9q2k'
+      fullPath: '/ctrl-7x9q2k'
+      preLoaderRoute: typeof AuthenticatedCtrl7x9q2kRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/cart': {
       id: '/_authenticated/cart'
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof AuthenticatedCartRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/account': {
@@ -422,8 +422,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCartRoute: typeof AuthenticatedCartRoute
+  AuthenticatedCtrl7x9q2kRoute: typeof AuthenticatedCtrl7x9q2kRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFavoritesRoute: typeof AuthenticatedFavoritesRoute
   AuthenticatedFinancingRoute: typeof AuthenticatedFinancingRoute
@@ -436,8 +436,8 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCartRoute: AuthenticatedCartRoute,
+  AuthenticatedCtrl7x9q2kRoute: AuthenticatedCtrl7x9q2kRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFavoritesRoute: AuthenticatedFavoritesRoute,
   AuthenticatedFinancingRoute: AuthenticatedFinancingRoute,
