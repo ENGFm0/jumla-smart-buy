@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Inbox, ChevronDown, Store, ExternalLink, PackageSearch } from "lucide-react";
+import { Inbox, ChevronDown, Store, ExternalLink, PackageSearch, Search, X } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { OrderCard } from "@/components/OrderCard";
@@ -41,6 +41,10 @@ function MyRequestsPage() {
   const refresh = () => qc.invalidateQueries({ queryKey: ["my-quote-requests"] });
 
   const [tab, setTab] = useState("active");
+  const [q, setQ] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const hasFilter = !!(q || from || to);
 
   const cat = useMemo(() => {
     const m = new Map<string, OrderCategory>();
@@ -52,7 +56,21 @@ function MyRequestsPage() {
   // فلترة بالتبويب ثم تجميع حسب الشركة (المورّد)
   const groups = useMemo<Group[]>(() => {
     const t = ORDER_TABS.find((x) => x.key === tab)!;
-    const filtered = requests.filter((r) => t.match(cat.get(r.id)!));
+    const ql = q.trim().toLowerCase();
+    const fromT = from ? new Date(from).getTime() : null;
+    const toT = to ? new Date(to).getTime() + 86_400_000 : null; // يشمل يوم "إلى" كاملاً
+    const filtered = requests.filter((r) => {
+      if (!t.match(cat.get(r.id)!)) return false;
+      if (ql) {
+        const hay =
+          `${r.product?.name ?? ""} ${r.custom_product ?? ""} ${r.supplier?.name ?? ""} ${r.note ?? ""}`.toLowerCase();
+        if (!hay.includes(ql)) return false;
+      }
+      const ct = new Date(r.created_at).getTime();
+      if (fromT && ct < fromT) return false;
+      if (toT && ct >= toT) return false;
+      return true;
+    });
     const map = new Map<string, Group>();
     for (const r of filtered) {
       const key = r.supplier?.id ?? "—";
@@ -78,7 +96,7 @@ function MyRequestsPage() {
     }
     arr.sort((a, b) => b.latest - a.latest);
     return arr;
-  }, [requests, cat, tab]);
+  }, [requests, cat, tab, q, from, to]);
 
   const [open, setOpen] = useState<Set<string>>(new Set());
   const toggle = (id: string) =>
@@ -105,6 +123,49 @@ function MyRequestsPage() {
 
         {requests.length > 0 && <OrderTabs tab={tab} setTab={setTab} counts={counts} />}
 
+        {requests.length > 0 && (
+          <div className="flex flex-col sm:flex-row gap-2 mb-5">
+            <div className="relative flex-1">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="ابحث باسم المنتج أو المورّد…"
+                className="w-full rounded-2xl border border-border bg-card pr-9 pl-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                className="rounded-2xl border border-border bg-card px-3 py-2.5 text-sm text-muted-foreground"
+                title="من تاريخ"
+              />
+              <span className="text-muted-foreground text-sm">—</span>
+              <input
+                type="date"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="rounded-2xl border border-border bg-card px-3 py-2.5 text-sm text-muted-foreground"
+                title="إلى تاريخ"
+              />
+              {hasFilter && (
+                <button
+                  onClick={() => {
+                    setQ("");
+                    setFrom("");
+                    setTo("");
+                  }}
+                  className="inline-flex items-center gap-1 rounded-2xl border border-border px-3 py-2.5 text-sm font-bold hover:bg-secondary transition"
+                >
+                  <X className="h-4 w-4" /> مسح
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
         ) : requests.length === 0 ? (
@@ -123,10 +184,10 @@ function MyRequestsPage() {
           </div>
         ) : groups.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-border p-12 text-center text-muted-foreground">
-            لا توجد طلبات في هذا التصنيف.
+            {hasFilter ? "لا توجد طلبات مطابقة لبحثك." : "لا توجد طلبات في هذا التصنيف."}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {groups.map((g) => {
               const key = g.supplierId ?? "—";
               const isOpen = open.has(key);
@@ -176,7 +237,7 @@ function MyRequestsPage() {
                   </div>
 
                   {isOpen && (
-                    <div className="border-t border-border p-3 sm:p-4 space-y-4 bg-secondary/20">
+                    <div className="border-t border-border p-3 sm:p-4 space-y-5 bg-secondary/20">
                       {g.orders.map((r) => (
                         <OrderCard key={r.id} order={r} role="buyer" onChange={refresh} />
                       ))}

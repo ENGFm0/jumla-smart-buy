@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import * as Icons from "lucide-react";
 import {
   Star,
   Truck,
@@ -94,6 +95,9 @@ export function OrderCard({
   const active = order.status !== "rejected" && !order.cancelled_at;
   const meta = stageMeta(order);
   const StatusIcon = meta.Icon;
+  const ProductIcon = (order.product?.icon
+    ? ((Icons as any)[order.product.icon] ?? Icons.Package)
+    : Icons.Package) as LucideIcon;
   const total = order.quoted_price != null ? Number(order.quoted_price) * order.quantity : null;
 
   return (
@@ -104,8 +108,8 @@ export function OrderCard({
       {/* الترويسة */}
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-3 min-w-0">
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-soft to-secondary flex items-center justify-center text-2xl shrink-0">
-            {order.product?.icon ?? "📦"}
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-brand-soft to-secondary text-primary flex items-center justify-center shrink-0">
+            <ProductIcon className="h-6 w-6" />
           </div>
           <div className="min-w-0">
             <h3 className="font-bold leading-tight flex items-center gap-2 flex-wrap">
