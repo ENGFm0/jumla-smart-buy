@@ -68,23 +68,37 @@ function DashboardPage() {
     }
   }, [supplier]);
 
+  const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null);
   async function saveSupplier(e: React.FormEvent) {
     e.preventDefault();
     if (!userId) return;
-    await upsertSupplier({
-      userId,
-      name,
-      city,
-      phone,
-      whatsapp,
-      description,
-      address,
-      mapsUrl,
-      iban,
-      bankName,
-      accountHolder,
-    });
-    qc.invalidateQueries({ queryKey: ["supplier", userId] });
+    setSaveMsg(null);
+    try {
+      await upsertSupplier({
+        userId,
+        name,
+        city,
+        phone,
+        whatsapp,
+        description,
+        address,
+        mapsUrl,
+        iban,
+        bankName,
+        accountHolder,
+      });
+      qc.invalidateQueries({ queryKey: ["supplier", userId] });
+      setSaveMsg({ ok: true, text: "تم حفظ بيانات المتجر" });
+    } catch (err: any) {
+      const m = String(err?.message ?? "");
+      const ibanCol = /iban|bank_name|account_holder|schema cache/i.test(m);
+      setSaveMsg({
+        ok: false,
+        text: ibanCol
+          ? "تعذّر حفظ الآيبان: لم تُفعّل أعمدة الحساب البنكي في قاعدة البيانات بعد. طبّق سكربت SQL أولاً."
+          : m || "تعذّر الحفظ",
+      });
+    }
   }
 
   // Add product form
@@ -252,7 +266,12 @@ function DashboardPage() {
               </div>
             )}
 
-            <details className="mt-4 rounded-3xl bg-card border border-border p-5">
+            {/* طلبات الزبائن أولاً وأبرز */}
+            <div className="mt-6">
+              <IncomingQuotes supplierId={supplier.id} />
+            </div>
+
+            <details className="mt-6 rounded-3xl bg-card border border-border p-5">
               <summary className="cursor-pointer font-bold text-sm">تعديل بيانات المتجر</summary>
               <form onSubmit={saveSupplier} className="grid md:grid-cols-2 gap-3 mt-4">
                 <input
@@ -328,6 +347,17 @@ function DashboardPage() {
                     />
                   </div>
                 </div>
+                {saveMsg && (
+                  <div
+                    className={`md:col-span-2 text-sm rounded-xl px-3 py-2 border ${
+                      saveMsg.ok
+                        ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+                        : "text-rose-700 bg-rose-50 border-rose-200"
+                    }`}
+                  >
+                    {saveMsg.text}
+                  </div>
+                )}
                 <button className="md:col-span-2 rounded-2xl bg-primary text-primary-foreground py-3 font-bold">
                   حفظ التعديلات
                 </button>
@@ -473,9 +503,6 @@ function DashboardPage() {
               </div>
             </div>
 
-            <div className="mt-6">
-              <IncomingQuotes supplierId={supplier.id} />
-            </div>
           </>
         )}
       </main>

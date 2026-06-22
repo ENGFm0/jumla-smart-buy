@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesInsert } from "@/integrations/supabase/types";
 import type { Supplier } from "@/types";
 
 // قائمة المدن المتاحة (فريدة) من الموردين — تُستخدم في فلتر البحث
@@ -46,7 +47,9 @@ export async function upsertSupplier(input: {
   bankName?: string;
   accountHolder?: string;
 }): Promise<Supplier> {
-  const fields = {
+  // الحقول الأساسية تُرسل دائماً. حقول الحساب البنكي تُرسل فقط إذا كُتبت،
+  // حتى لا يفشل الحفظ على القواعد التي لم تُطبّق فيها أعمدة الآيبان بعد.
+  const fields: TablesInsert<"suppliers"> = {
     name: input.name,
     city: input.city,
     phone: input.phone,
@@ -54,10 +57,10 @@ export async function upsertSupplier(input: {
     description: input.description ?? null,
     address: input.address ?? null,
     maps_url: input.mapsUrl ?? null,
-    iban: input.iban?.replace(/\s+/g, "").toUpperCase() || null,
-    bank_name: input.bankName ?? null,
-    account_holder: input.accountHolder ?? null,
   };
+  if (input.iban?.trim()) fields.iban = input.iban.replace(/\s+/g, "").toUpperCase();
+  if (input.bankName?.trim()) fields.bank_name = input.bankName.trim();
+  if (input.accountHolder?.trim()) fields.account_holder = input.accountHolder.trim();
   const existing = await getSupplierByUserId(input.userId);
   if (existing) {
     const { data, error } = await supabase

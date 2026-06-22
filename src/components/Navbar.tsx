@@ -40,9 +40,16 @@ export function Navbar() {
 
   const links: NavLink[] = [{ to: "/", label: "الرئيسية" }];
   if (user) {
-    links.push({ to: "/favorites", label: "المفضّلة" }, { to: "/my-requests", label: "طلباتي" });
-    if (!isSupplier) links.push({ to: "/financing", label: "شراء بالآجل" });
-    if (isSupplier) links.push({ to: "/dashboard", label: "لوحة المورّد" });
+    links.push({ to: "/favorites", label: "المفضّلة" });
+    // المورّد لا يطلب — نخفي «طلباتي» و«الشراء بالآجل» عنه، وتظهر له لوحته
+    if (isSupplier) {
+      links.push({ to: "/dashboard", label: "لوحة المورّد" });
+    } else {
+      links.push(
+        { to: "/my-requests", label: "طلباتي" },
+        { to: "/financing", label: "شراء بالآجل" },
+      );
+    }
     links.push({ to: "/account", label: "حسابي" });
     if (isAdmin) links.push({ to: "/admin", label: "الإدارة" });
   }
