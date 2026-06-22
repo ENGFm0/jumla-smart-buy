@@ -40,7 +40,7 @@ import { OrderTracker } from "@/components/OrderTracker";
 import { OrderTimeline } from "@/components/OrderTimeline";
 import { OrderInvoice } from "@/components/OrderInvoice";
 import { needsAction, lastActivity, fmtDayMonth } from "@/lib/orderFilters";
-import { formatSAR, type QuoteRequestDetailed, type QuoteStatus } from "@/types";
+import { formatSAR, orderRef, type QuoteRequestDetailed, type QuoteStatus } from "@/types";
 
 // حالة الطلب الحالية → نص + ألوان + أيقونة (تقود شريط البطاقة العلوي والشارة)
 type StageMeta = { label: string; badge: string; accent: string; Icon: LucideIcon };
@@ -160,8 +160,15 @@ export function OrderCard({
         </span>
       </div>
 
-      {/* شرائح: الكمية والإجمالي */}
+      {/* شرائح: الرقم المرجعي والكمية والإجمالي */}
       <div className="mt-3 flex items-center gap-2 flex-wrap">
+        <span
+          className="inline-flex items-center rounded-xl bg-secondary/60 px-2.5 py-1 text-xs font-bold font-mono"
+          dir="ltr"
+          title="رقم الطلب المرجعي"
+        >
+          {orderRef(order.id)}
+        </span>
         <span className="inline-flex items-center gap-1 rounded-xl bg-secondary/60 px-2.5 py-1 text-xs font-bold">
           <Hash className="h-3.5 w-3.5 text-muted-foreground" /> الكمية: {order.quantity}
         </span>
@@ -304,7 +311,10 @@ export function CollapsibleOrderCard({
             {order.product?.name ?? order.custom_product ?? "منتج"}
           </div>
           <div className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1.5 flex-wrap">
-            <span>الكمية {order.quantity}</span>
+            <span className="font-mono" dir="ltr">
+              {orderRef(order.id)}
+            </span>
+            <span>· الكمية {order.quantity}</span>
             {total != null && <span>· {formatSAR(total)}</span>}
             <span>· {fmtDayMonth(lastActivity(order))}</span>
             {action && <span className="font-bold text-amber-700">· يحتاج إجراء</span>}

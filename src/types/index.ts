@@ -57,6 +57,9 @@ export type QuoteRequestDetailed = QuoteRequest &
     supplier: Pick<Supplier, "id" | "name" | "city" | "phone" | "whatsapp"> | null;
   };
 
+// رقم مرجعي قصير للطلب (للمتابعة والدعم)
+export const orderRef = (id: string) => "#" + id.slice(0, 8).toUpperCase();
+
 // رسالة في محادثة الطلب (مع مرفق اختياري: صوت/صورة/ملف)
 export type QuoteMessage = {
   id: string;

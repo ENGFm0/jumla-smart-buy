@@ -35,6 +35,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FinancingAdmin } from "@/components/FinancingAdmin";
 import { DiscountsAdmin } from "@/components/DiscountsAdmin";
+import { AdminOrderDetail } from "@/components/AdminOrderDetail";
 import { useAuth, getUserRoles } from "@/lib/auth";
 import {
   getAdminStats,
@@ -61,13 +62,6 @@ const CAT_LABEL: Record<OrderCategory, string> = {
   done: "منتهٍ",
   rejected: "مرفوض/ملغي",
 };
-const CAT_BADGE: Record<OrderCategory, string> = {
-  waiting: "bg-slate-100 text-slate-600",
-  ongoing: "bg-sky-100 text-sky-700",
-  done: "bg-emerald-100 text-emerald-700",
-  rejected: "bg-rose-100 text-rose-700",
-};
-
 function AdminPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -350,7 +344,7 @@ function AdminPage() {
           </h2>
           <div className="space-y-2">
             {activeOrders.map((o) => (
-              <OrderLine key={o.id} o={o} />
+              <AdminOrderDetail key={o.id} order={o} buyer={buyers[o.buyer_id]} />
             ))}
             {activeOrders.length === 0 && (
               <div className="text-center text-sm text-muted-foreground py-6">لا توجد طلبات جارية الآن.</div>
@@ -492,25 +486,6 @@ function SearchBox({
         placeholder={placeholder}
         className="w-full rounded-2xl border border-border bg-background pr-9 pl-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40"
       />
-    </div>
-  );
-}
-
-function OrderLine({ o }: { o: AdminOrder }) {
-  const cat = classifyOrder(o as never);
-  const total = o.quoted_price != null ? Number(o.quoted_price) * o.quantity : null;
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3">
-      <div className="min-w-0 flex-1">
-        <div className="font-bold truncate">{o.product?.name ?? o.custom_product ?? "منتج"}</div>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          {o.supplier?.name ?? "—"} • الكمية {o.quantity}
-          {total != null ? ` • ${formatSAR(total)}` : ""}
-        </div>
-      </div>
-      <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold shrink-0 ${CAT_BADGE[cat]}`}>
-        {CAT_LABEL[cat]}
-      </span>
     </div>
   );
 }
