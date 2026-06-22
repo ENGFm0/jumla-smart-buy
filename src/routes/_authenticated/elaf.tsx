@@ -32,6 +32,7 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FinancingAdmin } from "@/components/FinancingAdmin";
+import { DiscountsAdmin } from "@/components/DiscountsAdmin";
 import { useAuth, getUserRoles } from "@/lib/auth";
 import {
   getAdminStats,
@@ -278,6 +279,9 @@ function AdminPage() {
             )}
           </div>
         </section>
+
+        {/* الخصومات والكوبونات */}
+        <DiscountsAdmin />
 
         {/* البيع بالآجل */}
         <FinancingAdmin />

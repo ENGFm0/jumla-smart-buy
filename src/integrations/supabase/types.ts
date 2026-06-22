@@ -368,6 +368,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      discounts: {
+        Row: {
+          active: boolean;
+          code: string | null;
+          created_at: string;
+          ends_at: string | null;
+          id: string;
+          label: string | null;
+          max_uses: number | null;
+          percent: number;
+          product_id: string | null;
+          starts_at: string | null;
+          type: string;
+          used_count: number;
+        };
+        Insert: {
+          active?: boolean;
+          code?: string | null;
+          created_at?: string;
+          ends_at?: string | null;
+          id?: string;
+          label?: string | null;
+          max_uses?: number | null;
+          percent: number;
+          product_id?: string | null;
+          starts_at?: string | null;
+          type: string;
+          used_count?: number;
+        };
+        Update: {
+          active?: boolean;
+          code?: string | null;
+          created_at?: string;
+          ends_at?: string | null;
+          id?: string;
+          label?: string | null;
+          max_uses?: number | null;
+          percent?: number;
+          product_id?: string | null;
+          starts_at?: string | null;
+          type?: string;
+          used_count?: number;
+        };
+        Relationships: [];
+      };
       offers: {
         Row: {
           created_at: string;
