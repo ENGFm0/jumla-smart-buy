@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Product, Supplier } from "@/types";
+import type { Product, QuoteRequest, Supplier } from "@/types";
 
 export type AdminStats = {
   suppliers: number;
@@ -59,4 +59,19 @@ export async function getAllProducts(): Promise<AdminProduct[]> {
 export async function deleteProduct(id: string) {
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw error;
+}
+
+// كل الطلبات (للأدمن) مع اسم المنتج والمورّد — لعرض الإحصاءات والطلبات الجارية
+export type AdminOrder = QuoteRequest & {
+  product: { name: string; icon: string } | null;
+  supplier: { id: string; name: string } | null;
+};
+
+export async function getAllOrders(): Promise<AdminOrder[]> {
+  const { data, error } = await supabase
+    .from("quote_requests")
+    .select("*, product:products(name, icon), supplier:suppliers(id, name)")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as AdminOrder[];
 }
