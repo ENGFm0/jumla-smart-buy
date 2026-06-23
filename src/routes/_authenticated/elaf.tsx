@@ -35,6 +35,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { FinancingAdmin } from "@/components/FinancingAdmin";
 import { DiscountsAdmin } from "@/components/DiscountsAdmin";
+import { PlatformSettings } from "@/components/PlatformSettings";
 import { AdminOrderDetail } from "@/components/AdminOrderDetail";
 import { useAuth, getUserRoles } from "@/lib/auth";
 import {
@@ -361,6 +362,9 @@ function AdminPage() {
             )}
           </div>
         </section>
+
+        {/* إعدادات المنصّة */}
+        <PlatformSettings />
 
         {/* الخصومات والكوبونات */}
         <DiscountsAdmin />

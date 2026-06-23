@@ -34,6 +34,12 @@ function OnboardingPage() {
     enabled: !!user,
   });
   const isSupplier = roles.includes("supplier");
+  const isAdmin = roles.includes("admin");
+
+  // الأدمن لا يختار دوراً — يُوجَّه للوحة الإدارة مباشرة
+  useEffect(() => {
+    if (isAdmin) navigate({ to: "/elaf" });
+  }, [isAdmin, navigate]);
 
   // إن كان الملف مكتملاً، وجّه المستخدم مباشرة
   const { data: supplier, isLoading: sLoading } = useQuery({

@@ -29,6 +29,8 @@ export function OfferRow({
   const tiers = parseTiers(offer.price_tiers);
   const diff = offer.price - minPrice;
   const diffPct = minPrice > 0 ? Math.round((diff / minPrice) * 100) : 0;
+  const moq = offer.moq || 1;
+  const outOfStock = offer.stock != null && offer.stock < moq;
 
   function add() {
     addToCart({
@@ -39,7 +41,9 @@ export function OfferRow({
       unit: unit ?? null,
       price: Number(offer.price),
       priceTiers: tiers.length > 0 ? tiers : null,
-      quantity: offer.moq || 1,
+      moq,
+      stock: offer.stock ?? null,
+      quantity: moq,
     });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
@@ -90,6 +94,11 @@ export function OfferRow({
               </span>
               <Rating value={Number(s.rating)} count={s.reviews_count} />
               <span>الحد الأدنى: {offer.moq}</span>
+              {offer.stock != null && (
+                <span className={offer.stock < 10 ? "text-amber-700 font-bold" : "text-emerald-700 font-bold"}>
+                  متوفّر: {offer.stock}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -121,13 +130,18 @@ export function OfferRow({
               />
               <button
                 onClick={add}
+                disabled={outOfStock}
                 className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold transition border ${
-                  added
-                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                    : "bg-secondary border-border hover:bg-secondary/70"
+                  outOfStock
+                    ? "bg-secondary/50 border-border text-muted-foreground cursor-not-allowed"
+                    : added
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      : "bg-secondary border-border hover:bg-secondary/70"
                 }`}
               >
-                {added ? (
+                {outOfStock ? (
+                  "غير متوفّر حالياً"
+                ) : added ? (
                   <>
                     <Check className="h-4 w-4" /> أُضيف للسلة
                   </>

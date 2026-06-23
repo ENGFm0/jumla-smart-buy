@@ -11,6 +11,8 @@ export type CartItem = {
   unit: string | null;
   price: number; // سعر القطعة (أقل كمية)
   priceTiers: PriceTier[] | null; // عروض الكمية
+  moq: number; // الحد الأدنى للطلب
+  stock: number | null; // المتوفّر (null = غير متتبّع)
   quantity: number;
 };
 

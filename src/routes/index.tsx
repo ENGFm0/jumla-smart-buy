@@ -4,7 +4,6 @@ import {
   Search,
   BarChart3,
   MessagesSquare,
-  PackageSearch,
   Package,
   TrendingDown,
   ShieldCheck,
@@ -247,20 +246,6 @@ function Index() {
           </div>
         )}
 
-        {/* CTA */}
-        <Reveal>
-          <div className="mt-12 rounded-[32px] bg-gradient-to-br from-primary to-teal-700 text-white p-8 md:p-10 text-center relative overflow-hidden">
-            <div className="pointer-events-none absolute -top-16 -left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl animate-blob" />
-            <h3 className="text-2xl md:text-3xl font-extrabold relative">ما لقيت المنتج اللي تبيه؟</h3>
-            <p className="text-white/85 mt-2 relative">اطلبه وسنوصل طلبك لكل الموردين المناسبين دفعة واحدة.</p>
-            <Link
-              to="/request-product"
-              className="relative inline-flex items-center gap-2 mt-6 rounded-full bg-white text-primary px-6 py-3 font-extrabold hover:scale-105 transition"
-            >
-              <PackageSearch className="h-5 w-5" /> اطلب منتجاً غير متوفّر
-            </Link>
-          </div>
-        </Reveal>
       </section>
 
       <Footer />

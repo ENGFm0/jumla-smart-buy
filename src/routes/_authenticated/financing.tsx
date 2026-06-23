@@ -27,6 +27,7 @@ import {
 } from "@/lib/financing";
 import { useCart } from "@/lib/cart";
 import { getMyQuoteRequests } from "@/lib/quotes";
+import { getFinancingEnabled } from "@/lib/settings";
 import { formatSAR, unitPriceForQty } from "@/types";
 
 export const Route = createFileRoute("/_authenticated/financing")({
@@ -94,6 +95,10 @@ const isId = (v: string) => /^\d{10}$/.test(v.trim());
 
 function FinancingPage() {
   const qc = useQueryClient();
+  const { data: financingEnabled = true } = useQuery({
+    queryKey: ["financing-enabled"],
+    queryFn: getFinancingEnabled,
+  });
   const { data: requests = [] } = useQuery({ queryKey: ["my-financing"], queryFn: getMyFinancing });
   const cart = useCart();
   const { data: myQuotes = [] } = useQuery({
@@ -204,6 +209,30 @@ function FinancingPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  if (!financingEnabled) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-16 flex-1">
+          <div className="max-w-md mx-auto text-center rounded-3xl border border-border p-10">
+            <Landmark className="h-12 w-12 mx-auto text-primary" />
+            <h1 className="font-extrabold text-2xl mt-3">الشراء بالآجل — قريباً</h1>
+            <p className="text-sm text-muted-foreground mt-2">
+              نعمل على تجهيز هذه الخدمة وستُتاح قريباً. شكراً لاهتمامك.
+            </p>
+            <Link
+              to="/search"
+              className="inline-block mt-6 rounded-full bg-primary text-primary-foreground px-6 py-2.5 font-bold"
+            >
+              تصفّح المنتجات
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

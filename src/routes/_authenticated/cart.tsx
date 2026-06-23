@@ -16,6 +16,13 @@ export const Route = createFileRoute("/_authenticated/cart")({
 
 type Group = { supplierId: string; supplierName: string; items: CartItem[]; subtotal: number };
 
+// حصر الكمية بين الحد الأدنى للمورّد والمتوفّر في المخزون
+function clampQ(it: CartItem, q: number) {
+  const min = it.moq ?? 1;
+  const max = it.stock ?? Number.POSITIVE_INFINITY;
+  return Math.min(max, Math.max(min, q));
+}
+
 function CartPage() {
   const items = useCart();
   const navigate = useNavigate();
@@ -200,33 +207,44 @@ function CartPage() {
                               </div>
                             );
                           })()}
+                          <div className="text-[11px] mt-0.5">
+                            <span className="text-muted-foreground">
+                              الحد الأدنى {it.moq ?? 1}
+                              {it.stock != null ? ` · المتوفّر ${it.stock}` : ""}
+                            </span>
+                            {it.stock != null && it.quantity >= it.stock && (
+                              <span className="text-amber-700 font-bold">
+                                {" "}
+                                · أقصى كمية متوفّرة — تواصل مع المورّد للمزيد
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() =>
-                              setQty(it.productId, it.supplierId, Math.max(1, it.quantity - 1))
+                              setQty(it.productId, it.supplierId, clampQ(it, it.quantity - 1))
                             }
-                            className="h-7 w-7 rounded-lg border border-border grid place-items-center hover:bg-secondary"
+                            disabled={it.quantity <= (it.moq ?? 1)}
+                            className="h-7 w-7 rounded-lg border border-border grid place-items-center hover:bg-secondary disabled:opacity-40"
                             aria-label="إنقاص"
                           >
                             <Minus className="h-3.5 w-3.5" />
                           </button>
                           <input
                             type="number"
-                            min={1}
+                            min={it.moq ?? 1}
+                            max={it.stock ?? undefined}
                             value={it.quantity}
                             onChange={(e) =>
-                              setQty(
-                                it.productId,
-                                it.supplierId,
-                                Math.max(1, Number(e.target.value) || 1),
-                              )
+                              setQty(it.productId, it.supplierId, clampQ(it, Number(e.target.value) || (it.moq ?? 1)))
                             }
                             className="w-14 text-center rounded-lg border border-border bg-background py-1 text-sm"
                           />
                           <button
-                            onClick={() => setQty(it.productId, it.supplierId, it.quantity + 1)}
-                            className="h-7 w-7 rounded-lg border border-border grid place-items-center hover:bg-secondary"
+                            onClick={() => setQty(it.productId, it.supplierId, clampQ(it, it.quantity + 1))}
+                            disabled={it.stock != null && it.quantity >= it.stock}
+                            className="h-7 w-7 rounded-lg border border-border grid place-items-center hover:bg-secondary disabled:opacity-40"
                             aria-label="زيادة"
                           >
                             <Plus className="h-3.5 w-3.5" />
