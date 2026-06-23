@@ -7,7 +7,7 @@ export function Preloader() {
   const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setRemoved(true), 3400);
+    const t = setTimeout(() => setRemoved(true), 3600);
     return () => clearTimeout(t);
   }, []);
 
@@ -44,8 +44,15 @@ function TruckScene() {
       role="img"
       aria-label="جاري التحميل"
     >
-      {/* الأرض */}
-      <line x1="8" y1="132" x2="272" y2="132" stroke="#e5e7eb" strokeWidth="3" strokeLinecap="round" />
+      {/* الشارع */}
+      <line x1="0" y1="131" x2="280" y2="131" stroke="#d8dee6" strokeWidth="4" />
+      <line className="road-line" x1="0" y1="138" x2="280" y2="138" stroke="#c2cad6" strokeWidth="3" />
+
+      {/* الكرتون الأخير يُرمى ويسقط على الشارع */}
+      <g className="pl-toss-street">
+        <rect x="48" y="48" width="22" height="19" rx="2" fill="#d99a55" />
+        <path d="M59 48 V67" stroke="#b9844a" strokeWidth="2" />
+      </g>
 
       {/* العامل */}
       <g>

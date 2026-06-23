@@ -212,6 +212,8 @@
   .pl-box,
   .pl-dot,
   .pl-toss,
+  .pl-toss-street,
+  .road-line,
   .truck-drive {
     animation: none;
     opacity: 1;
@@ -317,7 +319,7 @@
   animation: pl-toss 1.5s ease-in-out infinite;
 }
 
-/* الدينة تتحرّك وتطلع من الشاشة في النهاية */
+/* الدينة تتحرّك وتطلع من الشارع جهة اليمين في النهاية */
 @keyframes truck-drive {
   0%,
   68% {
@@ -325,11 +327,44 @@
   }
   92%,
   100% {
-    transform: translateX(-340px);
+    transform: translateX(340px);
   }
 }
 .truck-drive {
   animation: truck-drive 2.9s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
+/* الكرتون الأخير يُرمى ويسقط على الشارع ويبقى */
+@keyframes pl-toss-street {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  60% {
+    transform: translate(58px, -26px) rotate(120deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(104px, 66px) rotate(200deg);
+  }
+}
+.pl-toss-street {
+  transform-box: fill-box;
+  animation: pl-toss-street 1.15s ease-in 1.25s forwards;
+}
+
+/* خطوط الشارع تتحرّك */
+@keyframes road-move {
+  to {
+    stroke-dashoffset: -52;
+  }
+}
+.road-line {
+  stroke-dasharray: 16 14;
+  animation: road-move 0.7s linear infinite;
 }
 
 /* اختفاء شاشة التحميل بالـCSS وحده (ضمان ظهور الموقع حتى لو تعطّل JS) */
@@ -341,5 +376,5 @@
   }
 }
 .splash {
-  animation: splash-out 0.55s ease 2.7s forwards;
+  animation: splash-out 0.55s ease 2.9s forwards;
 }
