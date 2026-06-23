@@ -18,18 +18,6 @@ export function Preloader() {
       <div className="flex flex-col items-center gap-6 px-6">
         <Logo size={46} />
         <TruckScene />
-        <div className="flex items-center gap-1 text-sm font-bold text-muted-foreground">
-          جاري التحميل
-          <span className="pl-dot" style={{ animationDelay: "0s" }}>
-            .
-          </span>
-          <span className="pl-dot" style={{ animationDelay: ".2s" }}>
-            .
-          </span>
-          <span className="pl-dot" style={{ animationDelay: ".4s" }}>
-            .
-          </span>
-        </div>
       </div>
     </div>
   );
@@ -47,12 +35,6 @@ function TruckScene() {
       {/* الشارع */}
       <line x1="0" y1="131" x2="280" y2="131" stroke="#d8dee6" strokeWidth="4" />
       <line className="road-line" x1="0" y1="138" x2="280" y2="138" stroke="#c2cad6" strokeWidth="3" />
-
-      {/* الكرتون الأخير يُرمى ويسقط على الشارع */}
-      <g className="pl-toss-street">
-        <rect x="48" y="48" width="22" height="19" rx="2" fill="#d99a55" />
-        <path d="M59 48 V67" stroke="#b9844a" strokeWidth="2" />
-      </g>
 
       {/* العامل */}
       <g>
