@@ -287,3 +287,15 @@
 .pl-dot {
   animation: pl-dot 1.2s ease-in-out infinite;
 }
+
+/* اختفاء شاشة التحميل بالـCSS وحده (ضمان ظهور الموقع حتى لو تعطّل JS) */
+@keyframes splash-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+.splash {
+  animation: splash-out 0.6s ease 2s forwards;
+}

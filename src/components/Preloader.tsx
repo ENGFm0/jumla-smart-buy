@@ -2,27 +2,19 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 
 // شاشة تحميل: شخص يحمّل كراتين على «دينة» قبل أن يفتح الموقع.
+// تختفي عبر CSS (.splash) كي تظهر الصفحة حتى لو لم يعمل الجافاسكربت، ثم تُزال بالكامل.
 export function Preloader() {
-  const [hidden, setHidden] = useState(false);
   const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setHidden(true), 1700);
-    const t2 = setTimeout(() => setRemoved(true), 2250);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    const t = setTimeout(() => setRemoved(true), 2800);
+    return () => clearTimeout(t);
   }, []);
 
   if (removed) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-[100] grid place-items-center bg-background transition-opacity duration-500 ${
-        hidden ? "opacity-0 pointer-events-none" : "opacity-100"
-      }`}
-    >
+    <div className="splash fixed inset-0 z-[100] grid place-items-center bg-background">
       <div className="flex flex-col items-center gap-6 px-6">
         <Logo size={46} />
         <TruckScene />
