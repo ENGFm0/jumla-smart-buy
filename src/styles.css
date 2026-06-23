@@ -210,7 +210,9 @@
   .pl-bob,
   .pl-lift,
   .pl-box,
-  .pl-dot {
+  .pl-dot,
+  .pl-toss,
+  .truck-drive {
     animation: none;
     opacity: 1;
   }
@@ -288,6 +290,48 @@
   animation: pl-dot 1.2s ease-in-out infinite;
 }
 
+/* العامل يرمي كرتوناً نحو الدينة (يتكرّر) */
+@keyframes pl-toss {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  12% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(64px, -32px);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(120px, 44px);
+  }
+  88%,
+  100% {
+    opacity: 0;
+    transform: translate(120px, 44px);
+  }
+}
+.pl-toss {
+  transform-box: fill-box;
+  animation: pl-toss 1.5s ease-in-out infinite;
+}
+
+/* الدينة تتحرّك وتطلع من الشاشة في النهاية */
+@keyframes truck-drive {
+  0%,
+  68% {
+    transform: translateX(0);
+  }
+  92%,
+  100% {
+    transform: translateX(-340px);
+  }
+}
+.truck-drive {
+  animation: truck-drive 2.9s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+}
+
 /* اختفاء شاشة التحميل بالـCSS وحده (ضمان ظهور الموقع حتى لو تعطّل JS) */
 @keyframes splash-out {
   to {
@@ -297,5 +341,5 @@
   }
 }
 .splash {
-  animation: splash-out 0.6s ease 2s forwards;
+  animation: splash-out 0.55s ease 2.7s forwards;
 }

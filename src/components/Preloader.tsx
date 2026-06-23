@@ -7,7 +7,7 @@ export function Preloader() {
   const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setRemoved(true), 2800);
+    const t = setTimeout(() => setRemoved(true), 3400);
     return () => clearTimeout(t);
   }, []);
 
@@ -37,65 +37,72 @@ export function Preloader() {
 
 function TruckScene() {
   return (
-    <svg viewBox="0 0 260 150" width="260" height="150" className="max-w-[78vw]" role="img" aria-label="جاري التحميل">
+    <svg
+      viewBox="0 0 280 160"
+      className="w-[clamp(230px,80vw,400px)] h-auto"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label="جاري التحميل"
+    >
       {/* الأرض */}
-      <line x1="10" y1="126" x2="250" y2="126" stroke="#e5e7eb" strokeWidth="3" strokeLinecap="round" />
+      <line x1="8" y1="132" x2="272" y2="132" stroke="#e5e7eb" strokeWidth="3" strokeLinecap="round" />
 
-      {/* الشخص يحمّل كرتوناً */}
+      {/* العامل */}
+      <g>
+        <circle cx="60" cy="70" r="9" fill="#0f766e" />
+        <path d="M60 79 V104" stroke="#0f766e" strokeWidth="7" strokeLinecap="round" />
+        <path d="M60 104 L52 128 M60 104 L68 128" stroke="#0f766e" strokeWidth="6" strokeLinecap="round" />
+      </g>
+      {/* الذراعان يرفعان (يتحرّكان) */}
       <g className="pl-lift">
-        {/* الكرتون المرفوع */}
-        <rect x="40" y="46" width="26" height="22" rx="2" fill="#e0a86b" />
-        <path d="M53 46 V68" stroke="#b9844a" strokeWidth="2" />
-        <path d="M40 55 H66" stroke="#b9844a" strokeWidth="1.6" opacity="0.7" />
-        {/* الذراعان */}
-        <path d="M70 86 L60 66 M76 86 L66 66" stroke="#0f766e" strokeWidth="5" strokeLinecap="round" fill="none" />
-      </g>
-      <g>
-        {/* الرأس والجسم والأرجل */}
-        <circle cx="74" cy="74" r="9" fill="#0f766e" />
-        <path d="M74 83 V104" stroke="#0f766e" strokeWidth="7" strokeLinecap="round" />
-        <path d="M74 104 L66 124 M74 104 L82 124" stroke="#0f766e" strokeWidth="6" strokeLinecap="round" />
+        <path d="M60 86 L50 60 M60 86 L70 60" stroke="#0f766e" strokeWidth="5" strokeLinecap="round" fill="none" />
       </g>
 
-      {/* الدينة (شاحنة صغيرة) */}
-      <g className="pl-bob">
-        {/* الكراتين المحمّلة على الصندوق (تظهر بالتتابع) */}
-        <g>
+      {/* الكرتون الذي يرميه العامل نحو الدينة (يتكرّر) */}
+      <g className="pl-toss">
+        <rect x="48" y="48" width="24" height="20" rx="2" fill="#e0a86b" />
+        <path d="M60 48 V68" stroke="#b9844a" strokeWidth="2" />
+        <path d="M48 57 H72" stroke="#b9844a" strokeWidth="1.5" opacity="0.6" />
+      </g>
+
+      {/* الدينة — تتحرّك وتطلع من الشاشة في النهاية */}
+      <g className="truck-drive">
+        <g className="pl-bob">
+          {/* الكراتين المحمّلة */}
           <g className="pl-box" style={{ animationDelay: "0s" }}>
-            <rect x="150" y="86" width="24" height="22" rx="2" fill="#e0a86b" />
-            <path d="M162 86 V108" stroke="#b9844a" strokeWidth="2" />
+            <rect x="156" y="86" width="24" height="22" rx="2" fill="#e0a86b" />
+            <path d="M168 86 V108" stroke="#b9844a" strokeWidth="2" />
           </g>
-          <g className="pl-box" style={{ animationDelay: ".35s" }}>
-            <rect x="176" y="86" width="24" height="22" rx="2" fill="#d99a55" />
-            <path d="M188 86 V108" stroke="#b9844a" strokeWidth="2" />
+          <g className="pl-box" style={{ animationDelay: ".4s" }}>
+            <rect x="182" y="86" width="24" height="22" rx="2" fill="#d99a55" />
+            <path d="M194 86 V108" stroke="#b9844a" strokeWidth="2" />
           </g>
-          <g className="pl-box" style={{ animationDelay: ".7s" }}>
-            <rect x="163" y="64" width="24" height="22" rx="2" fill="#e7b277" />
-            <path d="M175 64 V86" stroke="#b9844a" strokeWidth="2" />
+          <g className="pl-box" style={{ animationDelay: ".8s" }}>
+            <rect x="169" y="64" width="24" height="22" rx="2" fill="#e7b277" />
+            <path d="M181 64 V86" stroke="#b9844a" strokeWidth="2" />
           </g>
+          {/* هيكل الدينة */}
+          <rect x="150" y="108" width="92" height="7" rx="3" fill="#0d7d6b" />
+          <rect x="150" y="100" width="66" height="10" rx="2" fill="#10b981" />
+          {/* الكابينة */}
+          <path d="M216 100 V78 H236 L244 100 Z" fill="#10b981" />
+          <rect x="220" y="82" width="15" height="13" rx="2" fill="#bdeede" />
         </g>
 
-        {/* هيكل الدينة */}
-        <rect x="146" y="108" width="86" height="6" rx="3" fill="#0d7d6b" />
-        <rect x="146" y="100" width="62" height="10" rx="2" fill="#10b981" />
-        {/* الكابينة */}
-        <path d="M208 100 V80 H226 L234 100 Z" fill="#10b981" />
-        <rect x="212" y="84" width="14" height="12" rx="2" fill="#bdeede" />
-      </g>
-
-      {/* العجلات */}
-      <g>
-        <circle cx="166" cy="116" r="12" fill="#1f2937" />
-        <circle cx="166" cy="116" r="5" fill="#9ca3af" />
-        <g className="pl-wheel">
-          <path d="M166 109 V123 M159 116 H173" stroke="#4b5563" strokeWidth="2" />
+        {/* العجلات */}
+        <g>
+          <circle cx="174" cy="118" r="13" fill="#1f2937" />
+          <circle cx="174" cy="118" r="5" fill="#9ca3af" />
+          <g className="pl-wheel">
+            <path d="M174 110 V126 M166 118 H182" stroke="#4b5563" strokeWidth="2" />
+          </g>
         </g>
-      </g>
-      <g>
-        <circle cx="218" cy="116" r="12" fill="#1f2937" />
-        <circle cx="218" cy="116" r="5" fill="#9ca3af" />
-        <g className="pl-wheel">
-          <path d="M218 109 V123 M211 116 H225" stroke="#4b5563" strokeWidth="2" />
+        <g>
+          <circle cx="228" cy="118" r="13" fill="#1f2937" />
+          <circle cx="228" cy="118" r="5" fill="#9ca3af" />
+          <g className="pl-wheel">
+            <path d="M228 110 V126 M220 118 H236" stroke="#4b5563" strokeWidth="2" />
+          </g>
         </g>
       </g>
     </svg>
