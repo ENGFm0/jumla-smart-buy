@@ -38,48 +38,66 @@ function TruckScene() {
 
       {/* العامل */}
       <g>
-        <circle cx="60" cy="70" r="9" fill="#0f766e" />
-        <path d="M60 79 V104" stroke="#0f766e" strokeWidth="7" strokeLinecap="round" />
-        <path d="M60 104 L52 128 M60 104 L68 128" stroke="#0f766e" strokeWidth="6" strokeLinecap="round" />
+        {/* الأرجل */}
+        <path d="M55 99 L51 127" stroke="#134e4a" strokeWidth="7" strokeLinecap="round" />
+        <path d="M63 99 L67 127" stroke="#134e4a" strokeWidth="7" strokeLinecap="round" />
+        {/* الأحذية */}
+        <path d="M47 127 H54" stroke="#0b3b34" strokeWidth="5" strokeLinecap="round" />
+        <path d="M64 127 H71" stroke="#0b3b34" strokeWidth="5" strokeLinecap="round" />
+        {/* الجذع (قميص العمل) */}
+        <path d="M49 76 Q49 70 55 70 H63 Q69 70 69 76 V100 H49 Z" fill="#0f766e" />
+        {/* الرأس */}
+        <circle cx="59" cy="60" r="9" fill="#e8b89a" />
+        {/* الكاب (قبّعة) */}
+        <path d="M50 56 Q59 47 68 56 Z" fill="#0d7d6b" />
+        <path d="M68 56 H79" stroke="#0d7d6b" strokeWidth="3.5" strokeLinecap="round" />
+        {/* الذراع الخلفية */}
+        <path d="M51 81 L45 71" stroke="#e8b89a" strokeWidth="5" strokeLinecap="round" />
       </g>
-      {/* الذراعان يتحرّكان */}
+      {/* الذراع الرامية (تتحرّك) */}
       <g className="pl-lift">
-        <path d="M60 86 L50 60 M60 86 L70 60" stroke="#0f766e" strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M66 79 L75 57" stroke="#e8b89a" strokeWidth="5" strokeLinecap="round" fill="none" />
       </g>
 
       {/* العامل يرمي الكرتون مرّتين — تدخل الدينة ثم يتوقّف قبل أن تتحرّك */}
       <g className="pl-toss">
-        <rect x="48" y="48" width="24" height="20" rx="2" fill="#e0a86b" />
-        <path d="M60 48 V68" stroke="#b9844a" strokeWidth="2" />
-        <path d="M48 57 H72" stroke="#b9844a" strokeWidth="1.5" opacity="0.6" />
+        <rect x="64" y="46" width="22" height="19" rx="2" fill="#e0a86b" />
+        <path d="M75 46 V65" stroke="#b9844a" strokeWidth="2" />
+        <path d="M64 55 H86" stroke="#b9844a" strokeWidth="1.5" opacity="0.6" />
       </g>
 
-      {/* الدينة — تتحرّك وتطلع من الشاشة في النهاية */}
+      {/* الدينة — أكثر واقعية، تتحرّك وتطلع يميناً */}
       <g className="truck-drive">
         <g className="pl-bob">
-          {/* الكراتين المحمّلة */}
+          {/* الكراتين داخل الصندوق */}
           <g className="pl-box" style={{ animationDelay: "0s" }}>
-            <rect x="156" y="86" width="24" height="22" rx="2" fill="#e0a86b" />
-            <path d="M168 86 V108" stroke="#b9844a" strokeWidth="2" />
+            <rect x="158" y="86" width="22" height="22" rx="2" fill="#e0a86b" />
+            <path d="M169 86 V108" stroke="#b9844a" strokeWidth="2" />
           </g>
           <g className="pl-box" style={{ animationDelay: ".4s" }}>
-            <rect x="182" y="86" width="24" height="22" rx="2" fill="#d99a55" />
-            <path d="M194 86 V108" stroke="#b9844a" strokeWidth="2" />
+            <rect x="182" y="86" width="22" height="22" rx="2" fill="#d99a55" />
+            <path d="M193 86 V108" stroke="#b9844a" strokeWidth="2" />
           </g>
           <g className="pl-box" style={{ animationDelay: ".8s" }}>
-            <rect x="169" y="64" width="24" height="22" rx="2" fill="#e7b277" />
+            <rect x="170" y="64" width="22" height="22" rx="2" fill="#e7b277" />
             <path d="M181 64 V86" stroke="#b9844a" strokeWidth="2" />
           </g>
-          {/* هيكل الدينة */}
-          <rect x="150" y="108" width="92" height="7" rx="3" fill="#0d7d6b" />
-          <rect x="150" y="100" width="66" height="10" rx="2" fill="#10b981" />
-          {/* الكابينة */}
-          <path d="M216 100 V78 H236 L244 100 Z" fill="#10b981" />
-          <rect x="220" y="82" width="15" height="13" rx="2" fill="#bdeede" />
+
+          {/* صندوق الحمولة (جدار خلفي + أرضية) */}
+          <rect x="150" y="84" width="5" height="26" fill="#0d7d6b" />
+          <rect x="150" y="104" width="62" height="6" fill="#0d7d6b" />
+          {/* الكابينة بزجاج أمامي مائل */}
+          <path d="M210 110 V86 Q210 80 216 80 H229 L245 101 V110 Z" fill="#10b981" />
+          <path d="M218 84 H228 L240 100 H218 Z" fill="#bdeede" />
+          <path d="M218 86 V110" stroke="#0d7d6b" strokeWidth="2" />
+          {/* الشاصي والمصباح */}
+          <rect x="150" y="109" width="98" height="6" rx="2" fill="#0b5f52" />
+          <circle cx="244" cy="105" r="2.6" fill="#fde68a" />
         </g>
 
-        {/* العجلات */}
+        {/* العجلات بأقواس */}
         <g>
+          <path d="M160 118 a14 14 0 0 1 28 0" fill="none" stroke="#0b5f52" strokeWidth="4" />
           <circle cx="174" cy="118" r="13" fill="#1f2937" />
           <circle cx="174" cy="118" r="5" fill="#9ca3af" />
           <g className="pl-wheel">
@@ -87,6 +105,7 @@ function TruckScene() {
           </g>
         </g>
         <g>
+          <path d="M214 118 a14 14 0 0 1 28 0" fill="none" stroke="#0b5f52" strokeWidth="4" />
           <circle cx="228" cy="118" r="13" fill="#1f2937" />
           <circle cx="228" cy="118" r="5" fill="#9ca3af" />
           <g className="pl-wheel">

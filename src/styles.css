@@ -356,15 +356,19 @@
   animation: pl-toss-street 1.15s ease-in 1.25s forwards;
 }
 
-/* خطوط الشارع تتحرّك */
-@keyframes road-move {
-  to {
-    stroke-dashoffset: -52;
+/* خطوط الشارع تتحرّك فقط عندما تتحرّك الدينة (نفس توقيت القيادة) */
+@keyframes road-scroll {
+  0%,
+  68% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -170;
   }
 }
 .road-line {
   stroke-dasharray: 16 14;
-  animation: road-move 0.7s linear infinite;
+  animation: road-scroll 2.9s cubic-bezier(0.5, 0, 0.75, 0) forwards;
 }
 
 /* اختفاء شاشة التحميل بالـCSS وحده (ضمان ظهور الموقع حتى لو تعطّل JS) */
