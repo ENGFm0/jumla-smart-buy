@@ -316,7 +316,7 @@
 }
 .pl-toss {
   transform-box: fill-box;
-  animation: pl-toss 1.5s ease-in-out infinite;
+  animation: pl-toss 0.95s ease-in-out 2 forwards;
 }
 
 /* الدينة تتحرّك وتطلع من الشارع جهة اليمين في النهاية */
