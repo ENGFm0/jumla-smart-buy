@@ -42,16 +42,11 @@ function TruckScene() {
         <path d="M60 79 V104" stroke="#0f766e" strokeWidth="7" strokeLinecap="round" />
         <path d="M60 104 L52 128 M60 104 L68 128" stroke="#0f766e" strokeWidth="6" strokeLinecap="round" />
       </g>
-      {/* الذراعان يرفعان (يتحرّكان) */}
+      {/* الذراعان مع كرتون في اليد (يتحرّكان بدون رمي) */}
       <g className="pl-lift">
-        <path d="M60 86 L50 60 M60 86 L70 60" stroke="#0f766e" strokeWidth="5" strokeLinecap="round" fill="none" />
-      </g>
-
-      {/* الكرتون الذي يرميه العامل نحو الدينة (يتكرّر) */}
-      <g className="pl-toss">
-        <rect x="48" y="48" width="24" height="20" rx="2" fill="#e0a86b" />
-        <path d="M60 48 V68" stroke="#b9844a" strokeWidth="2" />
-        <path d="M48 57 H72" stroke="#b9844a" strokeWidth="1.5" opacity="0.6" />
+        <rect x="49" y="42" width="22" height="17" rx="2" fill="#e0a86b" />
+        <path d="M60 42 V59" stroke="#b9844a" strokeWidth="2" />
+        <path d="M60 86 L50 58 M60 86 L70 58" stroke="#0f766e" strokeWidth="5" strokeLinecap="round" fill="none" />
       </g>
 
       {/* الدينة — تتحرّك وتطلع من الشاشة في النهاية */}
